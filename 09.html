@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 9 (Python Enhanced) - Mixin Conflict และ Audit Log</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 9 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง แก้ Mixin Conflict และสร้าง Audit Log สำหรับเอกสารทะเบียนนักศึกษา
+        (บริบท: ใบสมัครชมรม ใบเปลี่ยนคำนำหน้า หรือเอกสารขอใช้สถานที่)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือโอกาสพิเศษสำหรับคนที่อยากเป็น “คนคุมกติกา”
+        ของโค้ดที่นำชิ้นส่วนมาใช้ร่วมกัน การได้เห็นว่า “ความเงียบของ MRO” ทำให้ข้อมูลผิดโดยไม่พังในวันนี้
+        คือรางวัลที่จะทำให้คุณไม่ปล่อยให้ความกำกวมใด ๆ หลุดเข้าไปในระบบจริงตลอดอาชีพของคุณ
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> รายงาน audit ที่ถูกตีกลับเพราะ “เวลาผิดความหมาย”</h2>
+    <div class="story">
+        <p>
+            สัปดาห์ก่อนประกาศผลกิจกรรมชมรม ทีม A และทีม B รวมโค้ดเข้าด้วยกัน
+            ทีม A มี mixin บันทึก “เวลาสร้างเอกสาร” ทีม B มี mixin บันทึก “เวลาตรวจสอบเอกสาร”
+            — ทั้งสองตั้งชื่อเมธอดว่า <code>timestamp()</code> เหมือนกันแต่ความหมายต่างกัน
+            พอรวมคลาส Document ที่สืบทอดทั้งสอง mixin Python <strong>ไม่พังและไม่เตือนอะไรเลย</strong>
+            แต่เลือกตาม MRO ให้เอง — ผลคือรายงาน audit แสดง “เวลาสร้าง” ในช่อง “เวลาตรวจสอบ”
+            ผู้ตรวจสอบตีกลับรายงานทั้งฉบับ และทีมต้องค้างคืนเพื่อตามหาต้นตอ
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเหตุการณ์นี้ และความผิดพลาดนี้เป็นของ “คนตั้งชื่อ” หรือของ “การออกแบบที่ไม่มีกติกาประกาศความกำกวม” มากกว่ากัน</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) ทำไม Python จึงไม่ “เดา” หรือพังเสียงดังแบบ PHP (Fatal Error) แต่เลือกเงียบ ๆ ตาม MRO — คุณว่าแบบนี้ดีหรืออันตรายกว่ากัน เพราะเหตุใด</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “30 คลาสที่คัดลอกพฤติกรรมเดียวกัน”</h2>
+    <div class="story">
+        <p>
+            พี่ไอซ์ — Senior Engineer ใน software house เล่าว่าพฤติกรรมเล็ก ๆ อย่าง
+            timestamp / audit log / soft delete ถูก copy-paste กระจายอยู่ใน 30 คลาส
+            วันที่กฎหมายกำหนดให้ทุกเอกสารต้องมี audit log ทีมต้องไล่แก้ 30 แห่งและพลาดไป 3 แห่ง
+            — ผลคือถูกปรับในการ audit ปลายปี หลังวิกฤตเธอรวมพฤติกรรมร่วมไว้ใน mixin
+            และตั้งกติกาทีมว่า “ทุกครั้งที่ประกอบ mixin ที่มีชื่อชน ต้องประกาศลำดับ MRO
+            และเขียนเมธอดเรียกชัด ๆ สำหรับอีก implementation เสมอ”
+            ตั้งแต่นั้นการเพิ่มพฤติกรรมใหม่แก้เพียงที่เดียว และไม่มี collision หลุดไปถึง production อีกเลย
+            <em>“ความกำกวมที่ระบบยอมให้ผ่าน คือหนี้ที่ทีมจะต้องจ่ายตอนตีหนึ่ง”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>รวมพฤติกรรมร่วมไว้ในที่เดียว (DRY) — เขียนครั้งเดียว ใช้ได้หลายคลาส</li>
+            <li>แยกแต่ละ concern ออกจากกันเป็น mixin ละเรื่อง (Separation of Concerns)</li>
+            <li>เมื่อชื่อชนกัน ต้องประกาศกติกาชัดด้วยลำดับ MRO + เมธอดเรียกชัด ๆ — อย่าปล่อยให้เลือกเอง</li>
+            <li>ไม่ใช้ mixin พร่ำเพรื่อจนพฤติกรรมของคลาสกระจัดกระจายติดตามยาก</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: ความกำกวมที่ Python ไม่ยอมเดาให้ดัง ๆ</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ความเงียบในสนามซ้อมดีกว่าความเงียบในระบบจริง</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วทำนายว่า Python จะตอบว่าอย่างไร</p>
+<pre class="code">
+from datetime import datetime
+
+class Timestampable:
+    def timestamp(self) -> str:
+        return "Created: " + datetime.now().isoformat()
+
+class Auditable:
+    def timestamp(self) -> str:
+        return "Audited: " + datetime.now().isoformat()
+
+class Document(Timestampable, Auditable):
+    pass   # ไม่ประกาศกติกาใด ๆ! Python เลือกเงียบ ๆ ตาม MRO
+
+
+doc = Document()
+print(doc.timestamp())   # "Created: ..." — แต่รายงาน audit ต้องการ "Audited"!
+</pre>
+    </div>
+
+    <div class="q"><p>1) เหตุใด Python จึงพิมพ์ “Created:” ทั้งที่รายงาน audit ต้องการ “Audited:” และไม่พ่น error เหมือน PHP — การ “เลือกให้เงียบ ๆ” อันตรายอย่างไรในระบบทะเบียนหรือการเงิน</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากคุณเป็นคนออกแบบกติกา คุณจะประกาศอย่างไรให้ (ก) มี timestamp หลักเพียงหนึ่งความหมาย และ (ข) ยังเข้าถึง implementation ของอีก mixin ได้เมื่อต้องการ</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีแก้ mixin method collision มา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Mixin:</strong> คลาสที่ออกแบบมาเพื่อ “เติมพฤติกรรม” ให้คลาสอื่นผ่านการสืบทอดแบบหลายทาง สร้าง instance เองไม่ได้</li>
+            <li><strong>MRO (Method Resolution Order):</strong> เมธอดของ base class ที่อยู่ก่อนในวงเล็บจะชนะ — ตรวจลำดับได้จาก <code>Document.__mro__</code></li>
+            <li><strong>เทียบ PHP:</strong> ลำดับ base class ≈ <code>insteadof</code>; เมธอดเรียกชัด ๆ <code>Auditable.timestamp(self)</code> ≈ <code>as</code> alias</li>
+            <li><strong>DRY + Separation of Concerns:</strong> พฤติกรรมร่วมเขียนครั้งเดียว และแยกแต่ละ concern เป็น mixin ละเรื่อง</li>
+            <li><strong>กติกาทีม:</strong> เมื่อชื่อชนกัน ต้องประกาศลำดับ MRO และ alias/เมธอดเรียกชัด ๆ เสมอ — อย่าปล่อยให้เลือกเอง</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Mixin Composition</span>
+        <span class="badge">DRY</span>
+        <span class="badge">Separation of Concerns</span>
+        <span class="badge">Conflict Resolution</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class Timestampable {
+        &lt;&lt;mixin&gt;&gt;
+        +timestamp() str
+    }
+
+    class Auditable {
+        &lt;&lt;mixin&gt;&gt;
+        +timestamp() str
+        +audit_message() str
+    }
+
+    class Document {
+        +created_at() str
+        +timestamp() str
+        +audit_message() str
+        +audit_timestamp() str
+        +audit_log() str
+    }
+
+    Document --|> Timestampable : MRO wins (insteadof)
+    Document --|> Auditable : mixin
+    Document ..> Auditable : audit_timestamp alias
+    </pre>
+
+    <div class="note">
+        Python แก้ conflict ด้วยลำดับ base class (MRO) แทน insteadof
+        และใช้เมธอดเรียกชัด ๆ แทน as
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) “Mixin” ใน Python คืออะไร และแตกต่างจากการสืบทอดแบบปกติอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เมื่อ Document สืบทอดทั้ง Timestampable และ Auditable ซึ่งมี <code>timestamp()</code> ชนกัน Python ตัดสินใจอย่างไรว่าเมธอดของคลาสใดถูกใช้ (MRO คืออะไร) <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ป้าย “MRO wins (insteadof)” บนลูกศรไปยัง Timestampable หมายถึงอะไร และเทียบได้กับคำสั่งใดของ PHP <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) ลูกศรประ “audit_timestamp alias” หมายถึงอะไร และเทียบได้กับ keyword ใดของ PHP <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) หลังแก้ conflict แล้ว Document มีเมธอดใดให้ใช้งานบ้าง จง liệt kê ตามแผนภาพ <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) การใช้ Mixin ในข้อนี้สอดคล้องกับหลัก DRY และ Separation of Concerns อย่างไร <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+from datetime import datetime
+
+
+class Timestampable:
+    """Mixin: เวลาที่สร้างเอกสาร"""
+    def timestamp(self) -> str:
+        return "Created: " + datetime.now().isoformat()
+
+
+class Auditable:
+    """Mixin: เวลาตรวจสอบ + ข้อความ audit"""
+    def timestamp(self) -> str:
+        return "Audited: " + datetime.now().isoformat()
+
+    def audit_message(self) -> str:
+        return "Student document was audited."
+
+
+class Document(Timestampable, Auditable):
+    # ลำดับ base class ทำหน้าที่เหมือน insteadof:
+    # timestamp() ของ Timestampable ชนะตาม MRO
+    def audit_timestamp(self) -> str:
+        # ทำหน้าที่เหมือน alias: เรียก implementation ของ Auditable ชัดเจน
+        return Auditable.timestamp(self)
+
+    def created_at(self) -> str:
+        return self.timestamp()
+
+    def audit_log(self) -> str:
+        return f"{self.audit_timestamp()} | {self.audit_message()}"
+
+
+doc = Document()
+print(doc.created_at())
+print(doc.audit_log())
+print(Document.__mro__)
+</pre>
+    <div class="q"><p>1) การเรียก <code>doc.created_at()</code> ให้ผลลัพธ์ขึ้นต้นด้วยคำว่าอะไร เพราะใช้ <code>timestamp()</code> ของ mixin ใด และเพราะเหตุใด <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) การเรียก <code>doc.audit_timestamp()</code> ให้ผลลัพธ์ขึ้นต้นด้วยคำว่าอะไร ทั้งที่เมธอดนี้ไม่มีอยู่ใน mixin ใดเลย <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) หากสลับลำดับเป็น <code>class Document(Auditable, Timestampable)</code> ผลลัพธ์ของ <code>timestamp()</code> จะเปลี่ยนไปอย่างไร เพราะเหตุใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) เหตุใดจึงไม่ควรใช้ Mixin พร่ำเพรื่อจนพฤติกรรมของคลาสกระจัดกระจาย จงอธิบายด้วยหลัก Separation of Concerns <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+from datetime import datetime
+
+
+class Timestampable:
+    def timestamp(self) -> (5)________:
+        return "Created: " + datetime.now().(6)________________()
+
+
+class Document((1)________________, Auditable):
+    def (2)________________(self) -> str:
+        return Auditable.timestamp(self)
+
+    def created_at(self) -> str:
+        return self.(3)________________()
+
+    def audit_log(self) -> str:
+        return f"{self.audit_timestamp()} | {self.(4)________________()}"
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>doc.created_at()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>doc.timestamp()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>doc.audit_timestamp()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>doc.audit_message()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>doc.audit_log()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>print(Document.__mro__)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) Mixin Composition แตกต่างจาก Inheritance อย่างไร และควรเลือกใช้ Mixin เมื่อใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) ตัวอย่างนี้แสดงหลัก DRY อย่างไร จงอธิบาย <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) หากในอนาคตเพิ่ม Mixin SoftDeletable เข้ามาอีก นักศึกษาต้องระวังเรื่องใดเพื่อไม่ให้เกิด conflict ใหม่ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ พฤติกรรมใดคือ “ของร่วมข้ามคลาส” (timestamp / audit / soft delete) และคุณจะจัดกลุ่มเป็น mixin พร้อมกติกาการตั้งชื่อเพื่อป้องกัน collision อย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับนิสัย “ไม่ปล่อยความกำกวมไว้ในโค้ด — ประกาศกติกาให้ชัดเสมอ” ที่คุณจะนำไปใช้จริง</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับ mixin, MRO หรือการ reuse พฤติกรรม</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

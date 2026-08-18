@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 7 (Python Enhanced) - Order และ DiscountPolicy</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 7 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง Order และคำนวณยอดรวมด้วย DiscountPolicy
+        (บริบท: ร้านสวัสดิการนักศึกษา/ร้านชมรม รองรับส่วนลดนักศึกษา)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือโอกาสพิเศษสำหรับคนที่อยากออกแบบระบบที่
+        “ยอดเงินเชื่อถือได้ และนโยบายเปลี่ยนได้โดยไม่พัง” การได้เห็นยอดสุทธิเพี้ยนในสนามซ้อมวันนี้
+        คือรางวัลที่จะทำให้คุณเป็นคนที่ธุรกิจกล้าฝากตัวเลขไว้ด้วยในวันพรุ่งนี้
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> ยอดปิดบัญชีที่ไม่ตรงของร้านสวัสดิการ</h2>
+    <div class="story">
+        <p>
+            สัปดาห์สอบสุดท้าย ร้านสวัสดิการนักศึกษามียอดขายพุ่ง แต่ตอนปิดบัญชีกลับ
+            <strong>เงินขาดหายทั้งสัปดาห์</strong> ตรวจสอบพบว่าพนักงานพาร์ทไทม์แก้ “จำนวนชิ้น”
+            ในคำสั่งซื้อของลูกค้าประจำเพื่อแถมของฟรี โดยที่ระบบไม่ทักท้วงเลย
+            ที่ซ้ำร้ายกว่านั้น “ส่วนลดนักศึกษา 10%” ถูกเขียนตายไว้ในคลาส Order
+            สภานักศึกษาอยากเปลี่ยนโปรโมชันเป็น “ครบ 300 ลด 20” จึงทำไม่ได้ถ้าไม่แก้โค้ดทั้งก้อน
+            — และไม่มีใครกล้าแก้ช่วงสอบสุดท้าย
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเรื่องนี้ และระหว่าง “คนที่แอบแก้ข้อมูล” กับ “ระบบที่ยอมให้แก้ได้” คุณคิดว่าใครควรรับผิดชอบมากกว่ากัน เพราะเหตุใด</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) การที่ “สูตรส่วนลด” ถูกฝังตายไว้ใน Order สร้างความเจ็บปวดให้ใครบ้าง เมื่อธุรกิจอยากเปลี่ยนโปรโมชัน</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “วันที่แคมเปญ 3 ตัวตีกันในโค้ดเดียว”</h2>
+    <div class="story">
+        <p>
+            พี่เก่ง — Senior Engineer ทีม e-commerce เล่าว่าโค้ดเก่ามีสูตรส่วนลดทุกแบบ
+            (โค้ด 10%, สมาชิก 15%, แคมเปญ 20%) ฝังเป็น if-elif ยาวเหยียดในคลาส Order
+            วันที่ฝ่ายการตลาดยิง 3 แคมเปญพร้อมกัน สูตรตีกันเอง ระบบคิดส่วนลดผิดหลายพันคำสั่งซื้อ
+            บริษัทชดใช้หลักล้านบาท หลังวิกฤตเขา refactor แยก “นโยบายส่วนลด” แต่ละแบบเป็นคลาสอิสระ
+            ที่เสียบเข้า Order ผ่าน constructor ตั้งแต่นั้นการเพิ่มแคมเปญใหม่ใช้เวลาไม่ถึงชั่วโมง
+            และทีมการตลาดไม่ต้องรอคิวโปรแกรมเมอร์อีกเลย
+            <em>“ของที่เปลี่ยนบ่อยที่สุด ต้องอยู่ห่างจากของที่ไม่ควรเปลี่ยนที่สุด”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>ประกอบระบบจากวัตถุเล็ก ๆ (Composition) แทนการสร้างลำดับชั้นสืบทอดที่เปราะบาง</li>
+            <li>แยก “สูตร/นโยบาย” ที่เปลี่ยนบ่อยออกเป็น Strategy ภายใต้ interface เดียว</li>
+            <li>ให้คนที่ถือข้อมูลเป็นผู้คำนวณเอง (Information Expert) — OrderItem รู้ quantity/price จึงคำนวณ total เอง</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: Order ที่ทั้ง “แก้ได้” และ “รู้มากไป”</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ผิดหรือถูกไม่สำคัญ นี่คือการทดลองเพื่อเติบโต</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วสังเกตว่าความผิดพลาดสองแบบซ้อนทับกันอย่างไร</p>
+<pre class="code">
+class Order:
+    def __init__(self):
+        self.items = []   # ใครก็แก้ list ได้!
+
+    def total(self) -> float:
+        s = sum(i['quantity'] * i['unit_price'] for i in self.items)
+
+        # ส่วนลดถูก hardcode ไว้ใน Order!
+        if s >= 300:
+            s -= 20
+        return s * 0.90   # ส่วนลดนักศึกษา 10% ถูกใช้เสมอ
+
+
+order = Order()
+order.items.append({'quantity': 2, 'unit_price': 60})
+order.items[0]['quantity'] = -99   # ใครก็แก้รายการได้!
+print(order.total())
+</pre>
+    </div>
+
+    <div class="q"><p>1) ผลลัพธ์ที่ออกมาน่าแปลกใจอย่างไร และช่องโหว่ใดบ้างที่คุณพบ (ทั้งด้านข้อมูลและด้านนโยบาย)</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) คุณจะออกแบบอย่างไรให้ (ก) รายการสั่งซื้อถูกแอบแก้ไม่ได้ และ (ข) Order ไม่ต้องรู้จักสูตรส่วนลดแม้แต่สูตรเดียว</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีแยกนโยบายส่วนลดออกจาก Order มา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Composition over Inheritance:</strong> ประกอบพฤติกรรมจากวัตถุเล็ก ๆ แทนลำดับชั้นสืบทอดที่เปราะบาง</li>
+            <li><strong>Strategy Pattern:</strong> แยก “สูตร/นโยบาย” ที่เปลี่ยนบ่อยเป็นคลาสอิสระภายใต้ ABC เดียว</li>
+            <li><strong>Information Expert (GRASP):</strong> ผู้ถือข้อมูลควรรับผิดชอบการคำนวณ — OrderItem มี quantity/unit_price จึงคำนวณ total() เอง</li>
+            <li><strong>Validation ตอนสร้าง:</strong> ไม่ยอมให้สร้างรายการที่ผิด (quantity ≤ 0, ราคาติดลบ, ชื่อว่าง) ด้วย <code>__post_init__</code></li>
+            <li><strong>frozen dataclass:</strong> คำสั่งซื้อที่สร้างแล้วต้องไม่ถูกแอบแก้ — ยอดรวมจึงเชื่อถือได้</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Composition over Inheritance</span>
+        <span class="badge">Strategy Pattern</span>
+        <span class="badge">DIP</span>
+        <span class="badge">OCP</span>
+        <span class="badge">Information Expert</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class Order {
+        -_items: list[OrderItem]
+        -_discount_policy: DiscountPolicy
+        +__init__(items, discount_policy)
+        +subtotal() float
+        +total() float
+    }
+
+    class OrderItem {
+        &lt;&lt;dataclass frozen&gt;&gt;
+        +name: str
+        +quantity: int
+        +unit_price: float
+        +__post_init__() None
+        +total() float
+    }
+
+    class DiscountPolicy {
+        &lt;&lt;ABC&gt;&gt;
+        +discount(subtotal) float
+    }
+
+    class PercentageDiscount {
+        -_percent: float
+        +__init__(percent)
+        +discount(subtotal) float
+    }
+
+    class ValueError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    Order *-- OrderItem : composition
+    Order --> DiscountPolicy : injected
+    PercentageDiscount --|> DiscountPolicy : implements
+    OrderItem --> ValueError : raises
+    </pre>
+
+    <div class="note">
+        Order ไม่รู้สูตรส่วนลด เพราะพึ่งพา DiscountPolicy ABC
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) สัญลักษณ์สี่เหลี่ยมทึบ (composition) ด้าน Order ของความสัมพันธ์กับ OrderItem หมายถึงอะไร แตกต่างจาก aggregation อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เหตุใด OrderItem จึงเป็น «dataclass frozen» การออกแบบนี้ดีต่อระบบคำสั่งซื้ออย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลูกศร “injected” จาก Order ชี้ไปยัง DiscountPolicy สื่อความหมายว่าอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) ลูกศร “implements” จาก PercentageDiscount ไปยัง DiscountPolicy หมายถึงอะไร หากเพิ่มส่วนลดแบบจำนวนเงินคงที่ (FixedDiscount) ต้องแก้โค้ดส่วนใดบ้าง (OCP) <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) ลูกศร “raises” จาก OrderItem ชี้ไปยัง ValueError หมายถึงการตรวจสอบเงื่อนไขใดบ้าง <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) เมธอด <code>subtotal()</code> และ <code>total()</code> ของ Order แตกต่างกันอย่างไร <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class OrderItem:
+    name: str
+    quantity: int
+    unit_price: float
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Item name cannot be empty.")
+        if self.quantity &lt;= 0 or self.unit_price &lt; 0:
+            raise ValueError("Invalid order item.")
+
+    def total(self) -> float:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(ABC):
+    @abstractmethod
+    def discount(self, subtotal: float) -> float: ...
+
+
+class PercentageDiscount(DiscountPolicy):
+    def __init__(self, percent: float):
+        if percent &lt; 0 or percent &gt; 100:
+            raise ValueError("Percent must be between 0 and 100.")
+        self._percent = percent
+
+    def discount(self, subtotal: float) -> float:
+        return subtotal * self._percent / 100
+
+
+class Order:
+    def __init__(self, items: list[OrderItem], discount_policy: DiscountPolicy):
+        self._items = list(items)
+        self._discount_policy = discount_policy
+
+    def subtotal(self) -> float:
+        return sum(item.total() for item in self._items)
+
+    def total(self) -> float:
+        sub = self.subtotal()
+        return round(sub - self._discount_policy.discount(sub), 2)
+
+
+order = Order(
+    [OrderItem("ข้าวผัด", 2, 60.00), OrderItem("น้ำดื่ม", 2, 10.00)],
+    PercentageDiscount(10.0),
+)
+print(f"ยอดสุทธิร้านสวัสดิการนักศึกษา: {order.total():.2f} บาท")
+</pre>
+    <div class="q"><p>1) โค้ดบรรทัดใดแสดงให้เห็นว่า Order “ไม่รู้รายละเอียด” ของนโยบายส่วนลด จงอธิบาย <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) จงคำนวณยอดสุทธิของคำสั่งซื้อในโค้ด (ข้าวผัด 2 × 60, น้ำดื่ม 2 × 10, ส่วนลด 10%) พร้อมแสดงวิธีทำ <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) การสร้าง <code>OrderItem('', 1, 50)</code> และ <code>OrderItem('ปากกา', 0, 20)</code> จะเกิดอะไรขึ้นแต่ละกรณี เพราะเหตุใด <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) เหตุใดการตรวจสอบค่าใน frozen dataclass จึงอยู่ใน <code>__post_init__</code> แทน <code>__init__</code> <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass((1)________________)
+class OrderItem:
+    name: str
+    quantity: int
+    unit_price: float
+
+    def (2)________________(self) -> None:
+        if self.quantity &lt;= 0 or self.unit_price &lt; 0:
+            raise ValueError("Invalid order item.")
+
+    def total(self) -> float:
+        return self.quantity (3)____ self.unit_price
+
+
+class DiscountPolicy((4)________):
+    @abstractmethod
+    def discount(self, subtotal: float) -> float: ...
+
+
+class PercentageDiscount(DiscountPolicy):
+    def discount(self, subtotal: float) -> float:
+        return subtotal * self._percent / (5)______
+
+
+class Order:
+    def total(self) -> float:
+        sub = self.subtotal()
+        return round(sub - self._discount_policy.(6)________________(sub), 2)
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>OrderItem('ข้าวผัด', 2, 60).total()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>OrderItem('ปากกา', 0, 20)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>PercentageDiscount(150)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Order [ข้าวผัด 2×60, น้ำดื่ม 2×10] + PercentageDiscount(10): เรียก subtotal() และ total()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Order เดิมแต่เปลี่ยนเป็น PercentageDiscount(0)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Order([], PercentageDiscount(10)) แล้ว total()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) การใช้ composition แทน inheritance ในการประกอบ Order จาก OrderItem มีข้อดีอย่างไร จงยกตัวอย่างสถานการณ์ที่ inheritance จะทำให้การออกแบบแย่ลง <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) ระบบนี้สอดคล้องกับ OCP อย่างไร หากร้านสวัสดิการเพิ่มโปรโมชัน “ซื้อครบ 300 บาท ลดเพิ่ม 20 บาท” นักศึกษาจะออกแบบคลาสใหม่อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เหตุใดการให้ OrderItem รับผิดชอบเมธอด total() จึงถูกต้องตามหลัก Information Expert <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ ส่วนใดคือ “สูตรส่วนลดคนใหม่” (นโยบายที่เปลี่ยนบ่อย) และส่วนใดคือ “รายการสั่งซื้อคนใหม่” (ข้อมูลที่ห้ามพัง) คุณจะออกแบบแต่ละส่วนอย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับนิสัย “แยกของที่เปลี่ยนบ่อย ออกจากของที่ไม่ควรเปลี่ยน” ที่คุณจะนำไปใช้จริง</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับ composition, strategy หรือการปกป้องข้อมูลคำสั่งซื้อ</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 3 (Python Enhanced) - Shape และ Polymorphism</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 3 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง Inheritance / Polymorphism สำหรับคำนวณพื้นที่สื่อประชาสัมพันธ์กิจกรรมนักศึกษา
+        (บริบท: สติกเกอร์วงกลมติดบัตรนักศึกษา และป้ายโปสเตอร์สี่เหลี่ยม)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือโอกาสพิเศษสำหรับคนที่อยากหลุดพ้นจากโค้ดแบบ
+        “if-isinstance ทั่วจักรวาล” การที่คุณได้สัมผัสความเจ็บปวดของมันในวันนี้ในสนามซ้อม
+        คือรางวัลที่จะทำให้โค้ดของคุณในอนาคต “โตได้โดยไม่พัง”
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> คืนก่อนวันงานใหญ่</h2>
+    <div class="story">
+        <p>
+            ทีมประชาสัมพันธ์ต้องสั่งพิมพ์สื่อทุกชิ้นก่อนงานวันเดียว สมาชิกใหม่เขียนโค้ดคำนวณพื้นที่รวม
+            ด้วย if-elif ตรวจชนิดรูปทรงทีละแบบ แต่ไม่มีใครรู้ว่าสัปดาห์ก่อนชมรมเพิ่งเพิ่ม
+            “ป้ายทรงสามเหลี่ยม” เข้ามา — โค้ดจึง <strong>ข้ามมันไปอย่างเงียบ ๆ</strong>
+            ผลคือสั่งวัสดุไม่พอ ทีมต้องอยู่แก้งานถึงตีสาม และเกือบพลาดงานใหญ่
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับ “ความเงียบ” ของโค้ดที่ข้ามรูปทรงใหม่ไปโดยไม่บอกใคร และน่ากลัวกว่าการพังเสียงดังอย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากชมรมเพิ่มรูปทรงใหม่ทุกเดือน ใครจะต้องเหนื่อยที่สุด — คนออกแบบโค้ด หรือคนตามแก้โค้ด</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “isinstance 27 แห่ง”</h2>
+    <div class="story">
+        <p>
+            พี่ฝน — Senior Engineer ใน software house แห่งหนึ่ง เล่าว่าโค้ดระบบคำนวณค่าพิมพ์ของลูกค้า
+            มี <code>isinstance</code> กระจายอยู่ 27 แห่ง ทุกครั้งที่ลูกค้าเพิ่มรูปทรงใหม่
+            ทีมต้องตามแก้ทั้ง 27 แห่ง และพลาดอย่างน้อย 1 แห่งเสมอ จนวันหนึ่งเธอตัดสินใจ refactor
+            ให้ “วัตถุตอบเองว่าพื้นที่เท่าไร” ผ่าน ABC เดียว — ตั้งแต่นั้นการเพิ่มรูปทรงใหม่
+            ใช้เวลาไม่ถึงชั่วโมงและไม่เกิด regression อีกเลย
+            <em>“อย่าถามวัตถุว่ามันคืออะไร จงบอกให้มันทำหน้าที่ของมัน”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>ออกแบบให้ “การเพิ่มของใหม่” ไม่ต้องแตะโค้ดเดิม (Open/Closed Principle)</li>
+            <li>ทำให้คลาสลูกทุกตัวแทนที่สัญญา (ABC) ได้อย่างถูกต้อง (Liskov Substitution)</li>
+            <li>ให้โค้ดระดับสูงพึ่งพา abstraction ไม่ใช่ concrete class (Dependency Inversion)</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: โค้ดที่ “เงียบเกินไป”</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ผิดหรือถูกไม่สำคัญ นี่คือการทดลองเพื่อเติบโต</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วเติม Triangle เข้าไปในจินตนาการของคุณ</p>
+<pre class="code">
+import math
+
+class Circle:
+    def __init__(self, radius: float):
+        self._radius = radius
+
+    def area(self) -> float:
+        return math.pi * self._radius ** 2
+
+
+class Rectangle:
+    def __init__(self, width: float, height: float):
+        self._width = width
+        self._height = height
+
+    def area(self) -> float:
+        return self._width * self._height
+
+
+def total_area(shapes) -> float:
+    total = 0.0
+    for shape in shapes:
+        if isinstance(shape, Circle):
+            total += shape.area()
+        elif isinstance(shape, Rectangle):
+            total += shape.area()
+        # แล้ว Triangle ล่ะ? ...ถูกข้ามไปเงียบ ๆ!
+    return total
+</pre>
+    </div>
+
+    <div class="q"><p>1) หากเพิ่ม Triangle เข้าในระบบ ผลลัพธ์จะเป็นอย่างไร และเหตุใดความผิดพลาดแบบนี้จึงถูกค้นพบยาก</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) คุณจะออกแบบอย่างไรให้ “การลืมรูปทรงใหม่” เป็นไปไม่ได้เลย (ทำให้ระบบส่งเสียงเมื่อมีสิ่งที่ไม่รู้จัก)</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีกำจัด if-isinstance ในโค้ดนี้มา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>ABC + @abstractmethod:</strong> สัญญาที่บังคับให้ subclass ต้อง implement เมธอด มิเช่นนั้นสร้างวัตถุไม่ได้</li>
+            <li><strong>Polymorphism / Duck Typing:</strong> เรียกเมธอดเดียวกัน แต่แต่ละวัตถุ dispatch ไปยัง implementation ของตนเอง</li>
+            <li><strong>OCP:</strong> เปิดรับส่วนขยายใหม่ (เพิ่มคลาส) แต่ปิดรับการแก้ไขโค้ดเดิม</li>
+            <li><strong>LSP:</strong> คลาสลูกต้องแทนที่ ABC ได้อย่างถูกต้องตามสัญญา</li>
+            <li><strong>Validation ตอนสร้าง:</strong> ตรวจค่าใน <code>__init__</code> เพื่อป้องกันวัตถุที่ไม่ถูกต้อง (fail fast)</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Polymorphism</span>
+        <span class="badge">OCP</span>
+        <span class="badge">LSP</span>
+        <span class="badge">ABC</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class Shape {
+        &lt;&lt;ABC&gt;&gt;
+        +area() float
+    }
+
+    class Circle {
+        -_radius: float
+        +__init__(radius)
+        +area() float
+    }
+
+    class Rectangle {
+        -_width: float
+        -_height: float
+        +__init__(width, height)
+        +area() float
+    }
+
+    Circle --|> Shape : implements
+    Rectangle --|> Shape : implements
+    </pre>
+
+    <div class="note">
+        โค้ดหลักเรียก area() ผ่าน Shape โดยไม่ต้องตรวจชนิด (Polymorphism)
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) «ABC» ที่กำกับคลาส Shape หมายถึงอะไรใน Python และ <code>@abstractmethod</code> มีบทบาทอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) ลูกศร “implements” จาก Circle และ Rectangle ชี้ไปยัง Shape หมายถึงอะไรในเชิงโค้ด Python <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เหตุใดโค้ดหลักจึงไม่ต้องใช้ if หรือ isinstance ตรวจชนิดของคลาสก่อนเรียก area() <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) การเก็บข้อมูลเป็น <code>_radius</code>, <code>_width</code>, <code>_height</code> พร้อมตรวจสอบค่าใน <code>__init__</code> มีประโยชน์อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) หากต้องการเพิ่มรูปทรง Triangle ในอนาคต โค้ดส่วนใดต้องแก้ไขบ้าง (OCP) <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) หากสร้างคลาสที่สืบทอด Shape แต่ไม่ implement เมธอด area() จะเกิดอะไรขึ้นเมื่อพยายามสร้างวัตถุ <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, abstractmethod
+import math
+
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -&gt; float: ...
+
+
+class Circle(Shape):
+    def __init__(self, radius: float):
+        if radius &lt; 0:
+            raise ValueError("Radius cannot be negative.")
+        self._radius = radius
+
+    def area(self) -&gt; float:
+        return math.pi * self._radius ** 2
+
+
+class Rectangle(Shape):
+    def __init__(self, width: float, height: float):
+        if width &lt; 0 or height &lt; 0:
+            raise ValueError("Width and height cannot be negative.")
+        self._width = width
+        self._height = height
+
+    def area(self) -&gt; float:
+        return self._width * self._height
+
+
+promotion_media = [Circle(0.10), Rectangle(1.20, 0.80)]
+total_area = sum(shape.area() for shape in promotion_media)
+print(f"พื้นที่สื่อประชาสัมพันธ์รวม: {total_area:.2f} ตารางเมตร")
+</pre>
+    <div class="q"><p>1) บรรทัดใดในโค้ดหลักที่แสดง Polymorphism จงอธิบายการทำงาน <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) จงคำนวณพื้นที่ของ Circle รัศมี 0.10 และ Rectangle ขนาด 1.20 × 0.80 แล้วหาพื้นที่รวม (แสดงวิธีทำ) <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) การเรียก <code>Circle(-5)</code> จะเกิดอะไรขึ้น และเหตุใดจึงต้องตรวจสอบค่าใน <code>__init__</code> <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) หาก Circle ไม่สืบทอด Shape แต่ยังมีเมธอด area() อยู่ โค้ดหลักจะยังทำงานได้หรือไม่ เพราะแนวคิดใดของ Python <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, (1)____________________
+import math
+
+
+class Shape(ABC):
+    @(2)____________________
+    def area(self) -&gt; float: ...
+
+
+class Circle((3)________________):
+    def __init__(self, radius: float):
+        self._radius = radius
+
+    def area(self) -&gt; float:
+        return math.(4)________ * self._radius ** 2
+
+
+class Rectangle(Shape):
+    def __init__(self, width: float, height: float):
+        self._width = width
+        self._height = height
+
+    def area(self) -&gt; float:
+        return self._width (5)____ self._height
+
+
+total_area = (6)________(shape.area() for shape in promotion_media)
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>Circle(2).area()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Rectangle(3, 4).area()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Circle(-5)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Rectangle(3, -4)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>ผลรวม [Circle(0.10), Rectangle(1.20, 0.80)]</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>class Triangle(Shape) โดยไม่ implement area() แล้วสร้างวัตถุ</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) ระบบนี้สอดคล้องกับ Open/Closed Principle อย่างไร หากเพิ่ม Triangle โค้ดหลักต้องแก้ไขหรือไม่ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) Circle และ Rectangle สอดคล้องกับ Liskov Substitution Principle อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เทียบ interface ของ PHP กับ ABC ของ Python ว่ามีจุดเหมือน/ต่างกันอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ จุดใดคือ “if-isinstance คนใหม่” ที่มีแนวโน้มจะงอกทุกเดือน และคุณจะออกแบบให้วัตถุ “ตอบเอง” อย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับวิธีออกแบบระบบให้ “เพิ่มของใหม่ได้โดยไม่แตะของเดิม”</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับ polymorphism หรือการออกแบบ ABC</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

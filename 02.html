@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 2 (Python Enhanced) - BankAccount และ Domain Exception</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 2 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง การรักษายอดคงเหลือและ Domain Exception ด้วยคลาส BankAccount
+        (บริบท: กระเป๋าเงินอิเล็กทรอนิกส์ของนักศึกษา)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือ “สนามซ้อม” สำหรับคนที่อยากเขียนโค้ดระดับดูแลเงินของคนอื่นได้
+        การได้ทดลองผิดถูกกับกระเป๋าเงินจำลองในวันนี้ คือรางวัลที่จะปกป้องเงินจริงของผู้ใช้ในอนาคตของคุณ
+        ไม่ต้องกลัวพลาด — กระเป๋านี้ยังเป็นแค่สนามซ้อม
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> เหตุการณ์ที่โรงอาหาร</h2>
+    <div class="story">
+        <p>
+            ช่วงพักเที่ยงที่โรงอาหาร นักศึกษาคนหนึ่งยอดคงเหลือ 80 บาท
+            แต่ระบบกระเป๋าเงินอนุญาตให้จ่ายค่าข้าวผัด 120 บาทได้ ยอดคงเหลือจึงกลายเป็น <strong>-40 บาท</strong>
+            สิ้นเดือนเมื่อกระทบยอด บัญชีไม่ตรงกัน และป้าเจ้าของร้านต้องควักเงินตัวเองชดส่วนต่าง
+            ทั้งที่ไม่มีใครตั้งใจโกงเลยแม้แต่คนเดียว
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเรื่องนี้ และเห็นใจใครมากที่สุด เพราะเหตุใด</p>
+        <div class="line"></div></div>
+    <div class="q"><p>2) ความผิดพลาดนี้ควรถูกป้องกันที่ “ความระวังของคนเขียนโค้ด” หรือที่ “การออกแบบระบบ” มากกว่ากัน เพราะเหตุใด</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “วันที่ระบบยอมให้ถอนเกินยอด”</h2>
+    <div class="story">
+        <p>
+            พี่บีม — Senior Python Engineer สาย fintech เล่าว่าสมัยอยู่ทีมระบบชำระเงิน
+            โค้ดรุ่นแรก “ลืม” ตรวจสอบยอดคงเหลือในช่วงโปรโมชันถอนเงิน
+            ผลคือบริษัทต้องชดใช้ค่าเสียหายให้ลูกค้าหลักล้านบาทในวันเดียว
+            เขาบอกว่าบทเรียนที่แพงที่สุดวันนั้นสอนว่า
+            <em>“ระบบที่เกี่ยวกับเงิน ต้องไม่เชื่อใจผู้เรียกใช้แม้แต่นิดเดียว — กฎต้องอยู่ในวัตถุ ไม่ใช่อยู่ในคู่มือ”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ (สายระบบการเงิน):</strong></p>
+        <ul>
+            <li>ทำให้ invariant ชัดเจนและบังคับใช้ที่ขอบเขตของวัตถุ เช่น “ยอดห้ามติดลบ” ต้องถูกตรวจในคลาสเสมอ</li>
+            <li>ใช้ Domain Exception ให้ความผิดพลาดทางธุรกิจ “อ่านชื่อแล้วเข้าใจทันที” แยกจากความผิดพลาดเชิงเทคนิค</li>
+            <li>เขียนเทสกรณีพังก่อนสำเร็จเสมอ: จำนวนติดลบ, ศูนย์, ถอนเกินยอด, โอนให้ตัวเอง</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: กระเป๋าเงินรุ่นเปราะบาง</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — กระเป๋านี้ยังเป็นของจำลอง พังได้เต็มที่เพื่อเรียนรู้</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วทำนาย/ทดลองรันว่าเกิดอะไรขึ้น</p>
+<pre class="code">
+class BankAccount:
+    def __init__(self, account_number: str):
+        self.account_number = account_number
+        self.balance = 0.0
+
+    def withdraw(self, amount: float) -> None:
+        self.balance -= amount   # ไม่ตรวจว่ายอดพอไหม!
+
+a = BankAccount("STU-680001")
+a.balance = -9999   # ใครก็แก้ได้!
+a.withdraw(500)     # ถอนเกินยอดได้เฉยเลย
+print(a.balance)
+</pre>
+    </div>
+
+    <div class="q"><p>1) ผลลัพธ์สุดท้ายคืออะไร และช่องโหว่ใดบ้างที่คุณพบในโค้ดชุดนี้</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากต้องออกแบบใหม่ให้ “ถอนเกินยอดเป็นไปไม่ได้” คุณจะวางกฎไว้ที่ใดของระบบ เพราะเหตุใด</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีป้องกันยอดติดลบมา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ก่อนถก อย่าลืมฟังเพื่อนให้จบก่อนนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Invariant:</strong> ความจริงที่ต้องเป็นจริงเสมอ เช่น ยอดคงเหลือห้ามติดลบ, จำนวนฝาก/ถอนต้อง &gt; 0</li>
+            <li><strong>Domain Exception:</strong> Exception ที่สื่อความหมายทางธุรกิจ เช่น InsufficientFundsError แยกจากความผิดพลาดเชิงข้อมูล เช่น ValueError</li>
+            <li><strong>Python:</strong> <code>@property</code> แบบไม่มี setter ทำให้ balance อ่านได้จากภายนอกแต่แก้ไขผ่านเมธอดเท่านั้น</li>
+            <li><strong>Convention:</strong> ชื่อขึ้นต้น <code>_</code> สื่อว่า “ใช้ภายในคลาส” ไม่ควรเรียกจากภายนอก</li>
+            <li><strong>Tell Don't Ask:</strong> อย่าดึงข้อมูลออกมาตัดสินใจเองข้างนอก — “บอก” ให้วัตถุทำหน้าที่ของมันเอง</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Encapsulation</span>
+        <span class="badge">Domain Exception</span>
+        <span class="badge">SRP</span>
+        <span class="badge">Tell Don't Ask</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class BankAccount {
+        +account_number: str (property)
+        +balance: float (property)
+        +__init__(account_number)
+        +deposit(amount) None
+        +withdraw(amount) None
+        +transfer_to(target, amount) None
+        -_assert_positive(amount) None
+    }
+
+    class InsufficientFundsError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    class ValueError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    class Exception {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    InsufficientFundsError --|> Exception : inherits
+    BankAccount --> InsufficientFundsError : raises
+    BankAccount --> ValueError : raises
+    BankAccount --> BankAccount : target
+    </pre>
+
+    <div class="note">
+        Domain Exception แยกความผิดพลาดเชิงธุรกิจออกจากความผิดพลาดเชิงเทคนิค
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) สัญลักษณ์ <code>(property)</code> กำกับหลัง account_number และ balance หมายความว่าอย่างไร และเหตุใด balance จึงไม่มี setter <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) สัญลักษณ์ + และ - หน้าสมาชิกหมายถึงอะไร และการตั้งชื่อ <code>_assert_positive</code> ด้วย underscore เดี่ยวสื่อความหมายว่าอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) “Domain Exception” คืออะไร ในแผนภาพคือคลาสใด และแตกต่างจากการใช้ ValueError อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) ลูกศร “inherits” จาก InsufficientFundsError ชี้ไปยัง Exception หมายถึงอะไร และการสร้างคลาส Exception ของตัวเองมีประโยชน์อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) ลูกศร “target” ที่วนกลับไปยัง BankAccount เองหมายความว่าอย่างไร และเกี่ยวข้องกับเมธอดใด <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) จงระบุ Invariant ของคลาส BankAccount มา 2 ข้อ <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+class InsufficientFundsError(Exception):
+    """Domain exception: ยอดเงินไม่พอ"""
+
+
+class BankAccount:
+    def __init__(self, account_number: str):
+        self._account_number = account_number
+        self._balance = 0.0
+
+    @property
+    def account_number(self) -&gt; str:
+        return self._account_number
+
+    @property
+    def balance(self) -&gt; float:
+        return self._balance
+
+    def deposit(self, amount: float) -&gt; None:
+        self._assert_positive(amount)
+        self._balance += amount
+
+    def withdraw(self, amount: float) -&gt; None:
+        self._assert_positive(amount)
+        if amount &gt; self._balance:
+            raise InsufficientFundsError("Insufficient balance.")
+        self._balance -= amount
+
+    def transfer_to(self, target: "BankAccount", amount: float) -&gt; None:
+        self.withdraw(amount)
+        target.deposit(amount)
+
+    def _assert_positive(self, amount: float) -&gt; None:
+        if amount &lt;= 0:
+            raise ValueError("Amount must be positive.")
+</pre>
+    <div class="q"><p>1) โค้ดส่วนใดป้องกันการฝากหรือถอนจำนวนติดลบและศูนย์ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>2) เมื่อเรียก <code>deposit(300)</code> แล้วเรียก <code>withdraw(120)</code> ค่า balance จะเป็นเท่าใด จงแสดงวิธีทำ <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) หากยอดคงเหลือ 180 แล้วเรียก <code>withdraw(500)</code> จะเกิดอะไรขึ้น เพราะโค้ดบรรทัดใด <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) หากภายนอกคลาสเขียนว่า <code>account.balance = 9999</code> จะเกิดผลใด เพราะเหตุใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+class (1)____________________(Exception):
+    """Domain exception: ยอดเงินไม่พอ"""
+
+
+class BankAccount:
+    def __init__(self, account_number: str):
+        self._account_number = account_number
+        self._balance = 0.0
+
+    @(2)________________
+    def balance(self) -&gt; float:
+        return self._balance
+
+    def withdraw(self, amount: float) -&gt; None:
+        self._assert_positive(amount)
+        if amount &gt; (3)____________________:
+            raise InsufficientFundsError("Insufficient balance.")
+        self._balance (4)________ amount
+
+    def transfer_to(self, target: "BankAccount", amount: float) -&gt; None:
+        self.(5)________________(amount)
+        target.(6)________________(amount)
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:40%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>a = BankAccount("STU-680001"); a.deposit(300)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>a.withdraw(120)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>a.withdraw(500)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>a.deposit(-50)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>b = BankAccount("STU-680002"); a.transfer_to(b, 100)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>a.balance = 9999 (ภายนอกคลาส)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) คลาส BankAccount แสดงถึง Single Responsibility Principle อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หลัก “Tell Don't Ask” หมายความว่าอย่างไร และเมธอด transfer_to สะท้อนหลักการนี้อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เหตุใดจึงควรสร้าง Domain Exception อย่าง InsufficientFundsError แทนการใช้ ValueError ทุกกรณี <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ ข้อมูลใดคือ “balance คนใหม่” (ห้ามพังเด็ดขาด) และคุณจะเขียน invariant ของมันว่าอย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับวิธีจัดการ “ความผิดพลาดทางธุรกิจ” ในโค้ดของคุณนับจากนี้</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับระบบเงินหรือระบบที่มีกฎเข้มงวด</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

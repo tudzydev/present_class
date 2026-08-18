@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 6 (Python Enhanced) - Email Value Object</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 6 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง Value Object สำหรับอีเมลนักศึกษา (Email Value Object)
+        (บริบท: ระบบบัญชีนักศึกษาต้องการตรวจสอบอีเมลก่อนสมัครหรือยืนยันตัวตน)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือโอกาสพิเศษสำหรับคนที่อยากออกแบบให้
+        “ข้อมูลเล็ก ๆ อย่างอีเมล ไม่กลายเป็นปัญหาใหญ่” การได้เห็นว่าระบบพังเพราะช่องว่างเล็ก ๆ วันนี้
+        คือรางวัลที่จะทำให้คุณเป็นคนที่ไม่ปล่อยให้ความหมายของข้อมูลกระจัดกระจายอีกเลย
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> อีเมล 27 ฉบับที่ไปไม่ถึง</h2>
+    <div class="story">
+        <p>
+            มหาวิทยาลัยประกาศผลทุนการศึกษาผ่านอีเมล แต่มีอีเมล <strong>27 ฉบับตีกลับ</strong>
+            และที่เจ็บกว่านั้นคือ นักศึกษาคนหนึ่ง “หลุดทุน” ทั้งที่เกรดถึง
+            เพราะในระบบทุนเธอคือ <code>Student@Example.ac.th</code> (พิมพ์ใหญ่ มีช่องว่าง)
+            แต่ในระบบลงทะเบียนเธอคือ <code>student@example.ac.th</code>
+            — ระบบมองว่าเธอเป็นคนละคน และอีเมลแจ้งเตือนจึงส่งไปผิดบัญชี
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเรื่องนี้ และความผิดพลาดนี้เกิดจาก “คนพิมพ์ผิด” หรือจาก “ระบบที่ยอมให้ค่าแบบเดียวกันมีความหมายต่างกัน” มากกว่ากัน</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากแต่ละโมดูลตรวจสอบอีเมล “คนละแบบ” ใครควรเป็นเจ้าของกฎที่แท้จริงของคำว่า “อีเมลที่ถูกต้อง”</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “กฎ 12 แห่งที่ไม่มีใครเหมือนกัน”</h2>
+    <div class="story">
+        <p>
+            พี่ยิ่ง — Senior Engineer ทีม e-commerce เล่าว่าโค้ดตรวจสอบอีเมลถูก copy-paste ไป 12 แห่ง
+            บางแห่งเช็กแค่เครื่องหมาย @ บางแห่งใช้ regex คนละแบบ บางแห่งไม่เช็กเลย
+            วันที่ฝ่ายการตลาดขอ “normalize อีเมลเป็นตัวพิมพ์เล็กทั้งหมด” ทีมต้องไล่แก้ 12 แห่ง
+            และพลาด 2 แห่ง — ผลคือลูกค้าบางส่วนล็อกอินไม่ได้ทั้งสัปดาห์
+            หลังวิกฤตนั้นเธอสร้างคลาส Email ที่ “validate + normalize ตอนสร้างครั้งเดียว”
+            และห้ามแก้ไขค่าหลังสร้าง ตั้งแต่นั้น bug เกี่ยวกับอีเมลกลายเป็นศูนย์
+            <em>“ถ้ากฎอยู่ที่ 12 แห่ง แสดงว่าไม่มีกฎอยู่ที่ใดเลย”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>รวมค่าและกฎของแนวคิดหนึ่งไว้ในวัตถุเดียว (Value Object) — กฎเดียว ใช้ทั้งระบบ</li>
+            <li>บังคับ validate ตอนสร้างด้วย static factory — วัตถุที่สร้างสำเร็จ = ถูกต้องเสมอ (fail fast)</li>
+            <li>ทำให้ immutable — ค่าที่ validate แล้วต้องไม่ถูกทำให้เสียภายหลัง</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: สองฟังก์ชัน สองมาตรฐาน</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ผิดหรือถูกไม่สำคัญ นี่คือการทดลองเพื่อเติบโต</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วสังเกตว่า “คนเดียวกัน” กลายเป็น “สองคน” ได้อย่างไร</p>
+<pre class="code">
+import re
+
+def send_scholarship_email(email: str) -> None:
+    if '@' not in email:          # ตรวจแบบที่ 1
+        raise ValueError('invalid')
+    # ส่งเลย โดยไม่ normalize!
+
+def register_student(email: str) -> None:
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):  # ตรวจแบบที่ 2
+        raise ValueError('invalid')
+    # เก็บเลย โดยไม่ lower-case!
+
+a = ' Student@Example.ac.th '
+b = 'student@example.ac.th'
+# คนเดียวกันไหม? ...ระบบบอกว่า "คนละคน"!
+</pre>
+    </div>
+
+    <div class="q"><p>1) เหตุใดฟังก์ชันทั้งสองจึง “เห็น” อีเมลเดียวกันต่างกัน และความเสี่ยงของการมีกฎหลายแห่งคืออะไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) คุณจะออกแบบอย่างไรให้ “กฎของอีเมล” อยู่ในที่เดียว และทุกโมดูลได้ประโยชน์โดยอัตโนมัติ</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีรวมศูนย์การ validate อีเมลมา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Value Object:</strong> วัตถุที่ไม่มี identity เทียบด้วยค่า และรวมค่า + กฎตรวจสอบไว้ในที่เดียว</li>
+            <li><strong>Immutability:</strong> สร้างแล้วแก้ไขไม่ได้ — ค่าที่ validate แล้วไม่ถูกทำให้เสียภายหลัง</li>
+            <li><strong>Static Factory:</strong> บังคับ validate ก่อนสร้างวัตถุ (fail fast) เช่น <code>Email.from_string()</code></li>
+            <li><strong>Normalization:</strong> strip + lower-case เพื่อให้ “ค่าเดียวกัน” ถูกมองว่าเหมือนกันทั้งระบบ</li>
+            <li><strong>Python frozen dataclass:</strong> <code>@dataclass(frozen=True)</code> + <code>__post_init__</code> + <code>object.__setattr__</code> เพื่อ normalize ค่าในวัตถุที่แก้ไขไม่ได้</li>
+            <li><strong>DRY:</strong> กฎเขียนครั้งเดียว ใช้ได้ทุกแห่ง ไม่ต้อง copy-paste การตรวจสอบ</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Value Object</span>
+        <span class="badge">Immutability</span>
+        <span class="badge">SRP</span>
+        <span class="badge">Validation</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class Email {
+        &lt;&lt;dataclass frozen&gt;&gt;
+        +value: str
+        +__post_init__() None
+        +from_string(value) Email
+        +equals(other) bool
+        +__str__() str
+    }
+
+    class ValueError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    Email --> ValueError : raises
+    </pre>
+
+    <div class="note">
+        frozen dataclass = immutable; from_string เป็น static factory ที่ validate ก่อนสร้าง
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) «dataclass frozen» ที่กำกับคลาส Email หมายความว่าอย่างไร และเหตุใด Immutability จึงสำคัญต่อ Value Object <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เมธอด <code>from_string(value)</code> มีบทบาทอะไร และรูปแบบนี้เรียกว่าอะไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) <code>__post_init__()</code> ใน frozen dataclass มีบทบาทใด และเหตุใดจึงต้องใช้ออปเจกต์ <code>object.__setattr__</code> ในการแก้ค่า <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) ลูกศร “raises” ชี้ไปยัง ValueError หมายถึงพฤติกรรมใด และเกิดขึ้นเมื่อใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) เหตุใดเมธอด equals(other) จึงเปรียบเทียบด้วย “ค่า” แทน identity ของออบเจกต์ <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) เมธอด <code>__str__()</code> มีประโยชน์อย่างไรต่อการใช้งานจริง <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+import re
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Email:
+    value: str
+
+    def __post_init__(self) -> None:
+        normalized = self.value.strip().lower()
+        if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", normalized):
+            raise ValueError("Invalid email address.")
+        object.__setattr__(self, "value", normalized)
+
+    @classmethod
+    def from_string(cls, value: str) -> "Email":
+        return cls(value)
+
+    def equals(self, other: "Email") -> bool:
+        return self.value == other.value
+
+    def __str__(self) -> str:
+        return self.value
+
+
+student_email = Email.from_string("Student@Example.ac.th ")
+print(str(student_email))
+
+another_email = Email.from_string("student@example.ac.th")
+print(student_email.equals(another_email))
+</pre>
+    <div class="q"><p>1) ผลลัพธ์ของ <code>Email.from_string("Student@Example.ac.th ")</code> คืออะไร จงอธิบายการทำงานทีละขั้นตอน <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) การเรียก <code>Email.from_string("student@invalid")</code> จะเกิดอะไรขึ้น เพราะเหตุใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เหตุใด <code>equals</code> ระหว่าง "Student@Example.ac.th " กับ "student@example.ac.th" จึงคืนค่า True <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) หากพยายามแก้ไข <code>student_email.value = "x@y.z"</code> จะเกิดอะไรขึ้น เพราะเหตุใดจึงออกแบบเป็น frozen <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+import re
+from dataclasses import dataclass
+
+
+@dataclass((1)________________)
+class Email:
+    value: str
+
+    def (2)________________(self) -> None:
+        normalized = self.value.strip().(3)________()
+        if not re.(4)________________(r"[^@\s]+@[^@\s]+\.[^@\s]+", normalized):
+            raise ValueError("Invalid email address.")
+        (5)________.__setattr__(self, "value", normalized)
+
+    @(6)________________
+    def from_string(cls, value: str) -> "Email":
+        return cls(value)
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>Email.from_string('Student@Example.ac.th ') แล้ว str()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Email.from_string('invalid-email')</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>equals ระหว่าง ' a@b.co ' กับ 'A@B.CO'</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Email.from_string('')</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>print(email) (ใช้ __str__ โดยอ้อม)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>email.value = 'x@y.z' (พยายามแก้ไขค่า)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) Email Value Object ช่วยลดการเขียนกฎตรวจสอบซ้ำซ้อน (DRY) ในระบบได้อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เหตุใด Immutability จึงสำคัญต่อ Value Object จงยกตัวอย่างปัญหาหากค่าถูกแก้ไขได้หลังสร้าง <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) Email สามารถนำไปใช้ร่วมกับ Use Case อื่น (เช่น RegisterUserService ข้อ 10) ได้อย่างไร และดีอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ ข้อมูลใดคือ “อีเมลคนใหม่” (มีกฎตรวจสอบและถูกเขียนซ้ำกระจายอยู่) และคุณจะเปลี่ยนมันให้เป็น Value Object อย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับนิสัย “validate ครั้งเดียว ณ จุดสร้าง และห้ามแก้ไขภายหลัง” ที่คุณจะนำไปใช้จริง</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับ Value Object หรือ immutability</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 10 (Python Enhanced) - RegisterUserService และ Unit Test</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .warn {
+            background: #fff7ed;
+            color: #c2410c;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .celebrate {
+            background: linear-gradient(135deg, #eef2ff, #fdf4ff);
+            border: 2px solid #4f46e5;
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin: 1.5rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach, .celebrate { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 10 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง Use Case สมัครสมาชิกนักศึกษาพร้อมการทดสอบ (RegisterUserService)
+        (บริบท: ระบบสมาชิกของมหาวิทยาลัย ตรวจสอบอีเมล Hash รหัสผ่าน และบันทึกผ่าน Repository)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานสุดท้ายนี้คือ “ด่านผู้พิทักษ์” — โอกาสพิเศษสำหรับคนที่อยากพิสูจน์ว่า
+        ตนเองสามารถออกแบบระบบที่ทั้ง <strong>ปลอดภัย</strong> และ <strong>ทดสอบได้</strong>
+        การได้เห็นรหัสผ่านหลุดในสนามซ้อมวันนี้ คือรางวัลที่จะทำให้คุณไม่มีวันปล่อยให้ plain text
+        หลุดไปถึงระบบจริงตลอดอาชีพของคุณ
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> วันที่รหัสผ่านของสมาชิกทั้งสโมสรอยู่บนอินเทอร์เน็ต</h2>
+    <div class="story">
+        <p>
+            ระบบสมัครสมาชิกชมรมถูกแฮก และรหัสผ่านของสมาชิกหลายร้อยคนถูกเผยแพร่ในที่สาธารณะ
+            ผลสอบสวนพบว่าโค้ดเก็บรหัสผ่านแบบ <strong>plain text</strong> ในฐานข้อมูล
+            และฟังก์ชันลงทะเบียนเป็น “god function” ยาว 300 บรรทัดที่ผสมทั้ง validate, hash (ซึ่งจริง ๆ ไม่ได้ hash),
+            save และส่งอีเมลไว้ในที่เดียว ตอนผู้ตรวจสอบถามว่า “บรรทัดไหนรับผิดชอบการ hash?”
+            — ไม่มีใครชี้ได้ เพราะมันไม่มีอยู่จริง สมาชิกนับร้อยถอนตัวจากความเชื่อมั่นที่พังลง
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเรื่องนี้ และระหว่าง “คนที่แฮก” กับ “ระบบที่ทำให้การแฮกคุ้มค่า” คุณคิดว่าใครควรรับผิดชอบมากกว่ากัน เพราะเหตุใด</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากโค้ดทั้งหมดอยู่ในฟังก์ชันเดียว 300 บรรทัด ใครจะกล้าแก้ไขมันเมื่อต้องเปลี่ยนอัลกอริทึม hash หรือย้ายฐานข้อมูล</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “plain text ที่ไม่เคยถูกตั้งใจให้หลุด”</h2>
+    <div class="story">
+        <p>
+            พี่แทน — Senior Security Engineer เล่าว่าสมัยทำงานปีแรก เขาเก็บรหัสผ่านแบบ plain text
+            “ชั่วคราว” เพื่อความสะดวกในการ debug สามเดือนต่อมา test server โดนเจาะ
+            รหัสผู้ใช้ 50,000 คนถูกนำไปขายบน dark web บริษัทต้อง reset รหัสทั้งหมดและถูกปรับตามกฎหมายคุ้มครองข้อมูล
+            วันนั้นเขาเขียนกติกาชีวิตวิศวกรของตัวเองว่า
+            <em>“plain text ต้องไม่ผ่าน code review ของฉันอีกต่อไป”</em>
+            และ refactor ระบบลงทะเบียนโดยแยก “flow” ออกจาก “รายละเอียด” —
+            flow อยู่ใน Use Case Service ส่วน hashing และ storage อยู่หลัง interface ที่สลับได้และทดสอบได้
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ (สายความปลอดภัย):</strong></p>
+        <ul>
+            <li>ไม่เก็บ plain text เด็ดขาด — hash ด้วยอัลกอริทึมแข็งแรงพร้อม salt เสมอ</li>
+            <li>แยก “ผู้ประสานงาน” (Use Case Controller) ออกจาก “ผู้ลงมือทำรายละเอียด” (hasher / repository) ด้วย DI</li>
+            <li>เขียนเทสกรณีพังก่อนสำเร็จ: อีเมลผิด, รหัสสั้น, id ซ้ำ</li>
+            <li>ปฏิบัติต่อข้อมูลความลับเป็น concern แยก (Credential Entity) ไม่ปนกับข้อมูลตัวตน</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: god function แห่งหายนะ</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ระเบิดในสนามซ้อมดีกว่าระเบิดในระบบจริง</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วหา “ระเบิดเวลา” ทุกจุดที่คุณมองเห็น</p>
+<pre class="code">
+import sqlite3
+
+def register_student(data: dict) -> str:
+    # validate + เชื่อม DB + บันทึก ...ทั้งหมดในฟังก์ชันเดียว!
+    if '@' not in data['email']:
+        return 'invalid email'
+
+    conn = sqlite3.connect('club.db')
+    conn.execute(
+        "INSERT INTO students (id, email, password) VALUES (?, ?, ?)",
+        (data['id'], data['email'], data['password']),  # เก็บรหัสผ่านแบบ PLAIN TEXT!
+    )
+    conn.commit()
+    return 'ok'
+</pre>
+    </div>
+
+    <div class="q"><p>1) จงระบุ “ระเบิดเวลา” ในโค้ดนี้ให้ครบที่สุด (ความปลอดภัย, การทดสอบ, การบำรุงรักษา) และแต่ละลูกจะระเบิดเมื่อใด</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) คุณจะผ่า god function นี้ออกเป็นชิ้นส่วนที่มีหน้าที่ชัดเจนอย่างไร และชิ้นใดควรอยู่หลัง ABC เพื่อให้สลับ/ทดสอบได้</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธี refactor ฟังก์ชันนี้มา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Use Case Controller:</strong> ผู้ประสาน flow (validate → hash → save) ไม่ลงมือทำรายละเอียดเอง</li>
+            <li><strong>Dependency Injection:</strong> รับ UserRepository / PasswordHasher จากภายนอก → เทสด้วย Fake ได้</li>
+            <li><strong>Security by Design:</strong> ไม่เก็บ plain text; hash พร้อม salt; validate ก่อน save; ตรวจ id ซ้ำ</li>
+            <li><strong>GRASP Creator:</strong> ผู้ที่มีข้อมูลครบ (id, email ที่ validate แล้ว, hash) คือผู้สร้าง User</li>
+            <li><strong>Protected Variations:</strong> ห่ออัลกอริทึม hash และเทคโนโลยีจัดเก็บด้วย ABC ที่มั่นคง</li>
+            <li><strong>หมายเหตุงานจริง:</strong> ต้องการ Argon2id จริงให้ใช้ argon2-cffi แทน scrypt</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Use Case Controller</span>
+        <span class="badge">DIP</span>
+        <span class="badge">Dependency Injection</span>
+        <span class="badge">GRASP Creator</span>
+        <span class="badge">Protected Variations</span>
+        <span class="badge">Security by Design</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class User {
+        &lt;&lt;dataclass frozen&gt;&gt;
+        +id: int
+        +email: str
+        +password_hash: str
+    }
+
+    class Email {
+        &lt;&lt;dataclass frozen&gt;&gt;
+        +value: str
+        +from_string(value) Email
+        +__str__() str
+    }
+
+    class UserRepository {
+        &lt;&lt;ABC&gt;&gt;
+        +save(user) None
+        +find_by_id(id) User or None
+        +all() list[User]
+    }
+
+    class InMemoryUserRepository {
+        -_users: dict[int, User]
+        +save(user) None
+        +find_by_id(id) User or None
+        +all() list[User]
+    }
+
+    class PasswordHasher {
+        &lt;&lt;ABC&gt;&gt;
+        +hash(plain_text) str
+    }
+
+    class ScryptPasswordHasher {
+        +hash(plain_text) str
+        +verify(plain_text, stored) bool
+    }
+
+    class RegisterUserService {
+        -_users: UserRepository
+        -_hasher: PasswordHasher
+        +__init__(users, hasher)
+        +register(id, email, password) User
+    }
+
+    class ValueError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    InMemoryUserRepository --|> UserRepository : implements
+    ScryptPasswordHasher --|> PasswordHasher : implements
+    InMemoryUserRepository --> User : stores
+    RegisterUserService --> UserRepository : injected
+    RegisterUserService --> PasswordHasher : injected
+    RegisterUserService --> Email : validates
+    RegisterUserService --> User : creates
+    RegisterUserService --> ValueError : raises
+    </pre>
+
+    <div class="note">
+        RegisterUserService ทำหน้าที่เป็น Use Case Controller
+        ไม่ควรรับผิดชอบการ hash เอง หรือสร้าง Repository เอง
+        แต่ควรพึ่งพา abstraction ผ่าน Dependency Injection
+    </div>
+
+    <div class="warn">
+        ในระบบจริงควรแยก password_hash ไปไว้ใน Credential Entity
+        หรือตารางที่ออกแบบมาเพื่อข้อมูลความลับโดยเฉพาะ
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) RegisterUserService ทำหน้าที่เป็น Use Case Controller หมายความว่าอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) ลูกศร “injected” จาก RegisterUserService ไปยัง UserRepository และ PasswordHasher หมายถึงอะไร และเหตุใด Service จึงไม่ควรสร้าง Repository เอง <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) Email «dataclass frozen» มีบทบาทอย่างไรใน Use Case นี้ (ป้าย validates) <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) ลูกศร “raises” ชี้ไปยัง ValueError หมายถึงการป้องกันกรณีใดบ้าง <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>5) ScryptPasswordHasher ทำหน้าที่เป็น Strategy อย่างไร และการเพิ่ม hasher ใหม่สอดคล้องกับ OCP อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>6) ป้าย “creates” บนลูกศรจาก RegisterUserService ไปยัง User หมายถึงอะไรตามหลัก GRASP Creator <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+import hashlib
+import secrets
+import re
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class User:
+    id: int
+    email: str
+    password_hash: str
+
+
+class UserRepository(ABC):
+    @abstractmethod
+    def save(self, user: User) -&gt; None: ...
+
+    @abstractmethod
+    def find_by_id(self, user_id: int) -&gt; User | None: ...
+
+    @abstractmethod
+    def all(self) -&gt; list[User]: ...
+
+
+class InMemoryUserRepository(UserRepository):
+    def __init__(self):
+        self._users: dict[int, User] = {}
+
+    def save(self, user: User) -&gt; None:
+        self._users[user.id] = user
+
+    def find_by_id(self, user_id: int) -&gt; User | None:
+        return self._users.get(user_id)
+
+    def all(self) -&gt; list[User]:
+        return list(self._users.values())
+
+
+@dataclass(frozen=True)
+class Email:
+    value: str
+
+    def __post_init__(self) -&gt; None:
+        normalized = self.value.strip().lower()
+        if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", normalized):
+            raise ValueError("Invalid email address.")
+        object.__setattr__(self, "value", normalized)
+
+    @classmethod
+    def from_string(cls, value: str) -&gt; "Email":
+        return cls(value)
+
+    def __str__(self) -&gt; str:
+        return self.value
+
+
+class PasswordHasher(ABC):
+    @abstractmethod
+    def hash(self, plain_text: str) -&gt; str: ...
+
+
+class ScryptPasswordHasher(PasswordHasher):
+    def hash(self, plain_text: str) -&gt; str:
+        salt = secrets.token_hex(16)
+        digest = hashlib.scrypt(
+            plain_text.encode(), salt=bytes.fromhex(salt), n=2**14, r=8, p=1
+        ).hex()
+        return f"scrypt${salt}${digest}"
+
+    def verify(self, plain_text: str, stored: str) -&gt; bool:
+        _, salt, digest = stored.split("$")
+        calc = hashlib.scrypt(
+            plain_text.encode(), salt=bytes.fromhex(salt), n=2**14, r=8, p=1
+        ).hex()
+        return secrets.compare_digest(calc, digest)
+
+
+class RegisterUserService:
+    def __init__(self, users: UserRepository, hasher: PasswordHasher):
+        self._users = users
+        self._hasher = hasher
+
+    def register(self, user_id: int, email: str, password: str) -&gt; User:
+        user_email = Email.from_string(email)
+
+        if len(password) &lt; 12:
+            raise ValueError("Password must be at least 12 characters.")
+
+        if self._users.find_by_id(user_id) is not None:
+            raise ValueError("Student ID already exists.")
+
+        password_hash = self._hasher.hash(password)
+        user = User(user_id, str(user_email), password_hash)
+        self._users.save(user)
+        return user
+
+
+repo = InMemoryUserRepository()
+service = RegisterUserService(repo, ScryptPasswordHasher())
+
+student = service.register(680001, "student@example.ac.th", "StudentPass123!")
+print("Registered:", student.email)
+print("Hash verified:", ScryptPasswordHasher().verify("StudentPass123!", student.password_hash))
+</pre>
+    <div class="q"><p>1) โค้ดส่วนใดแสดงให้เห็นว่าระบบไม่เก็บรหัสผ่านแบบ Plain Text จงอธิบาย <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) การเรียก <code>register(680002, 'invalid-email', 'StudentPass123!')</code> จะเกิดอะไรขึ้น และข้อมูลจะถูกบันทึกหรือไม่ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) การเรียก <code>register(680003, 'valid@example.ac.th', 'short')</code> จะเกิดอะไรขึ้น เหตุใดจึงกำหนดความยาวขั้นต่ำ 12 ตัวอักษร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) การที่ Service รับ UserRepository เป็น ABC ช่วยให้การเขียน Unit Test ง่ายขึ้นอย่างไร <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+class ScryptPasswordHasher(PasswordHasher):
+    def hash(self, plain_text: str) -&gt; str:
+        salt = secrets.(1)________________(16)
+        ...
+
+
+class RegisterUserService:
+    def __init__(self, users: (2)________________, hasher: PasswordHasher):
+        self._users = users
+        self._hasher = hasher
+
+    def register(self, user_id: int, email: str, password: str) -&gt; User:
+        user_email = Email.(3)________________(email)
+
+        if len(password) &lt; 12:
+            raise (4)________________("Password must be at least 12 characters.")
+
+        password_hash = self._hasher.(5)________________(password)
+
+        user = User(user_id, str(user_email), password_hash)
+        self._users.(6)________________(user)
+
+        return user
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>register(680001, 'student@example.ac.th', 'StudentPass123!')</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>register(680002, 'invalid-email', 'StudentPass123!')</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>register(680003, 'valid@example.ac.th', 'short')</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>register(680001, 'another@example.ac.th', 'StudentPass123!') (id ซ้ำ)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>hasher.verify('StudentPass123!', student.password_hash)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>len(repo.all()) หลังสมัครสำเร็จ 1 คน</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) Use Case นี้สะท้อนหลัก Security by Design อย่างไร จงยกตัวอย่างอย่างน้อย 2 จุด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) จงอธิบายแนวทางเขียน Unit Test โดยใช้ FakeUserRepository ที่ implements UserRepository เดียวกัน <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เหตุใดในระบบจริงจึงควรแยก password_hash ไปไว้ใน Credential Entity แทนการเก็บใน User โดยตรง <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ถัดไปของคุณ ฟังก์ชันใดคือ “god function คนใหม่” (ทุกอย่างผสมในที่เดียว) และคุณจะผ่ามันเป็น Controller + ชิ้นส่วนหลัง ABC อย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับนิสัยความปลอดภัย (เช่น “plain text ต้องไม่ผ่านโค้ดของฉัน”) ที่คุณจะยึดถือตลอดอาชีพ</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect + Celebration -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>คุณเดินทางครบทั้ง 10 ใบงานแล้ว! ชมตัวเองสำหรับความพยายามที่ยิ่งใหญ่ที่สุด 1 เรื่อง แล้วบันทึกว่า “หลักการใดที่จะเปลี่ยนวิธีเขียนโค้ดของคุณไปตลอดกาล”</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <div class="celebrate">
+        <h2 style="margin-top:0; background:none; border:none; padding:0;">🎓 เฉลิมฉลองการจบการเดินทางทั้ง 10 ใบงาน!</h2>
+        <p>
+            จาก <strong>Encapsulation</strong> (ข้อ 1) สู่ <strong>Domain Exception</strong> (ข้อ 2),
+            <strong>Polymorphism</strong> (ข้อ 3), <strong>Strategy + DI</strong> (ข้อ 4),
+            <strong>Repository</strong> (ข้อ 5), <strong>Value Object</strong> (ข้อ 6),
+            <strong>Composition</strong> (ข้อ 7), <strong>Notifier</strong> (ข้อ 8),
+            <strong>Mixin</strong> (ข้อ 9) จนมาถึง <strong>Use Case + Security</strong> (ข้อ 10) —
+            คุณได้สร้าง “เข็มขัดเครื่องมือ” ของวิศวกรซอฟต์แวร์ครบชุดแล้ว
+            จงพกมันออกไปสร้างระบบที่ทั้งแข็งแรง ปลอดภัย และเปลี่ยนแปลงได้โดยไม่พัง
+        </p>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 1 (Python Enhanced) - Product และ Encapsulation</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 1 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง การห่อหุ้มข้อมูลและการรักษา Invariant ด้วยคลาส Product
+        (บริบท: สินค้าสหกรณ์นักศึกษา)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้ไม่ใช่แบบฝึกหัดธรรมดา แต่คือ “โอกาสพิเศษ”
+        สำหรับคนที่อยากเขียนโค้ดที่คนอื่นแก้พังไม่ได้ การที่คุณเลือกจะลงมือทดลองและค้นพบหลักการด้วยตนเองในวันนี้
+        คือรางวัลที่จะติดตัวคุณไปตลอดเส้นทางนักพัฒนา
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> สถานการณ์ร้านสหกรณ์ฯ</h2>
+    <div class="story">
+        <p>
+            เช้าวันแรกของงาน “ลดราคาต้นภาคเรียน” ป้ายระบบแสดงราคาสมุดโน้ต 45 บาท
+            แต่พนักงานพาร์ทไทม์ที่รีบร้อน เปิดโค้ด Python แล้วแก้ตัวแปรราคาเป็น <strong>-500</strong>
+            เพื่อ “ให้ส่วนลดพิเศษ” ผลคือเครื่องคิดเงินทอนเงินผิดทั้งวัน
+            สหกรณ์ฯ ขาดทุนโดยไม่มีใครตั้งใจให้เกิดขึ้นแม้แต่คนเดียว
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเหตุการณ์นี้ และกังวลเรื่องใดมากที่สุดหากคุณเป็นเจ้าของระบบ</p>
+        <div class="line"></div></div>
+    <div class="q"><p>2) ความผิดพลาดนี้เกิดจาก “คน” หรือ “การออกแบบ” มากกว่ากัน เพราะเหตุใด</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “บรรทัดเดียวที่เปลี่ยนวิธีคิด”</h2>
+    <div class="story">
+        <p>
+            พี่มิ้น — Senior Python Engineer เล่าว่าสมัยทำงานปีแรก เธอเขียนคลาสราคาแบบ “เปิดโล่ง”
+            ให้ใครก็แก้ attribute ได้ วันหนึ่งสคริปต์รายงานของฝ่ายการตลาดเผลอไปแก้ราคาทั้งหมดเป็นศูนย์
+            ระบบหน้าร้านแสดงสินค้าฟรีทั้งวัน บริษัทเสียหายนับแสนบาท
+            วันนั้นหัวหน้าไม่ได้ด่า แต่พูดว่า
+            <em>“อย่าออกแบบระบบที่พึ่งพาความระวังของคน จงออกแบบระบบที่ทำให้พลาดไม่ได้”</em>
+            ประโยคนั้นกลายเป็นหลักทำงานของเธอจนถึงทุกวันนี้
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>ทำให้ “สถานะที่ผิด” เป็นไปไม่ได้ตั้งแต่ระดับการออกแบบ (Make illegal states unrepresentable)</li>
+            <li>ปกป้องกฎธุรกิจไว้ที่ขอบเขตของวัตถุ ด้วย property ที่ไม่มี setter</li>
+            <li>เขียนเทสกรณี “พัง” ก่อนกรณี “สำเร็จ” เสมอ</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: ลองพังระบบดูสักครั้ง</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ผิดหรือถูกไม่สำคัญ นี่คือการทดลองเพื่อเติบโต</p>
+        <p>พิจารณาโค้ด “รุ่นเปราะบาง” ต่อไปนี้ แล้วทำนาย/ทดลองรันว่าเกิดอะไรขึ้น</p>
+<pre class="code">
+class Product:
+    def __init__(self, id: int, name: str, price: float):
+        self.id = id
+        self.name = name
+        self.price = price   # ใครก็แก้ได้!
+
+p = Product(1, 'สมุดโน้ต', 45.00)
+p.price = -500   # ไม่มีอะไรทักท้วงเลย
+print(p.price)
+</pre>
+    </div>
+
+    <div class="q"><p>1) ผลลัพธ์คืออะไร และเหตุใดโค้ดภายนอกจึงแก้ราคาได้โดยไม่ถูกทักท้วง</p>
+        <div class="line"></div></div>
+    <div class="q"><p>2) หากต้องเลือก “จุดเดียว” ในคลาสเพื่อเฝ้าระวังราคา คุณจะเลือกจุดใด เพราะเหตุใด</p>
+        <div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีป้องกันราคาติดลบใน Python มา 3 วิธี แล้วถกเถียงกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด เพราะเหตุผลใด (AI เชื่อถือได้มากน้อยเพียงใด?)</p>
+        <div class="line"></div>
+        <div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Encapsulation:</strong> รวมข้อมูล + เมธอดไว้ในที่เดียว และควบคุมการเข้าถึงจากภายนอก</li>
+            <li><strong>Invariant:</strong> ความจริงที่ต้องเป็นจริงเสมอ เช่น price ≥ 0, ส่วนลด 0–100</li>
+            <li><strong>Python:</strong> <code>@property</code> แบบไม่มี setter = อ่านได้แต่แก้โดยตรงไม่ได้</li>
+            <li><strong>Convention:</strong> ชื่อขึ้นต้น <code>_</code> สื่อว่า “ใช้ภายในคลาส” ไม่ควรเรียกจากภายนอก</li>
+            <li><strong>Information Expert (GRASP):</strong> ใครมีข้อมูล คนนั้นควรรับผิดชอบพฤติกรรม</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Encapsulation</span>
+        <span class="badge">Information Hiding</span>
+        <span class="badge">SRP</span>
+        <span class="badge">Invariant</span>
+        <span class="badge">Information Expert</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class Product {
+        +id: int (property)
+        +name: str (property)
+        +price: float (property)
+        +__init__(id, name, price)
+        +apply_discount(percent) None
+        +display_price() str
+        -_validate_price(price) float
+    }
+
+    class ValueError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    Product --> ValueError : raises
+    </pre>
+
+    <div class="note">
+        price อ่านได้ผ่าน property แต่แก้ไขโดยตรงไม่ได้ ต้องผ่าน apply_discount() เท่านั้น
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) สัญลักษณ์ <code>(property)</code> กำกับหลัง id, name, price หมายความว่าอย่างไรใน Python และแตกต่างจาก attribute ปกติอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) สัญลักษณ์ + และ - หน้าสมาชิกหมายถึงอะไร และการตั้งชื่อ <code>_validate_price</code> ด้วย underscore เดี่ยวสื่อความหมายตาม convention ของ Python ว่าอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เหตุใด <code>price</code> จึงอ่านได้แต่ไม่สามารถกำหนดค่าจากภายนอกได้ ใช้กลไกใดของ Python <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) จงระบุ Invariant ของคลาส Product มา 2 ข้อ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) ลูกศรที่กำกับว่า “raises” ชี้ไปยัง ValueError หมายความว่าอย่างไร และเกิดขึ้นเมื่อใด <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) เพราะเหตุใด Product จึงถือเป็น “Information Expert” ในการคำนวณราคาหลังลด <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+class Product:
+    def __init__(self, product_id: int, name: str, price: float):
+        self._id = product_id
+        self._name = name
+        self._price = self._validate_price(price)
+
+    @property
+    def id(self) -&gt; int:
+        return self._id
+
+    @property
+    def name(self) -&gt; str:
+        return self._name
+
+    @property
+    def price(self) -&gt; float:
+        return self._price
+
+    def apply_discount(self, percent: float) -&gt; None:
+        if percent &lt; 0 or percent &gt; 100:
+            raise ValueError("Discount must be between 0 and 100.")
+        self._price = round(self._price * (100 - percent) / 100, 2)
+
+    def display_price(self) -&gt; str:
+        return f"{self._name} (#{self._id}) ราคา: {self._price:.2f} บาท"
+
+    def _validate_price(self, price: float) -&gt; float:
+        if price &lt; 0:
+            raise ValueError("Price cannot be negative.")
+        return round(price, 2)
+</pre>
+    <div class="q"><p>1) โค้ดบรรทัดใดป้องกันไม่ให้สร้างสินค้าที่มีราคาติดลบ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>2) เมื่อเรียก <code>Product(1, 'สมุดโน้ต', 45.00)</code> แล้วเรียก <code>apply_discount(10)</code> ค่า price จะเป็นเท่าใด จงแสดงวิธีทำ <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) หากเรียก <code>apply_discount(150)</code> จะเกิดอะไรขึ้น เพราะโค้ดบรรทัดใด <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) หากภายนอกคลาสเขียนว่า <code>product.price = -500</code> จะเกิดผลใด เพราะเหตุใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+class Product:
+    def __init__(self, product_id: int, name: str, price: float):
+        self._id = product_id
+        self._name = name
+        self._price = self.(6)____________________(price)
+
+    @(1)________________
+    def price(self) -&gt; float:
+        return self._price
+
+    def apply_discount(self, percent: float) -&gt; None:
+        if percent &lt; 0 or percent &gt; 100:
+            raise (2)____________________("Discount must be between 0 and 100.")
+        self._price = round(self._price * (100 - percent) / (3)______, 2)
+
+    def _validate_price(self, price: float) -&gt; float:
+        if price &lt; 0:
+            raise (4)____________________("Price cannot be negative.")
+        return (5)________(price, 2)
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:40%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>p = Product(1, 'สมุดโน้ต', 45.00) แล้ว p.display_price()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>p.apply_discount(10) แล้วดูค่า p.price</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>p.apply_discount(150)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>p.apply_discount(-5)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Product(2, 'ปากกา', -10)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>p.price = 999 (ภายนอกคลาส)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) คลาส Product แสดงถึง Single Responsibility Principle อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) Information Hiding ปรากฏอยู่ในจุดใดของคลาสนี้บ้าง จงยกตัวอย่างอย่างน้อย 2 จุด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เทียบกับ PHP 8.4: กลไกใดของ PHP ที่เทียบเท่ากับ <code>@property</code> แบบไม่มี setter และเทียบเท่ากับ <code>readonly</code> <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ ข้อมูลใดคือ “price คนใหม่” (ห้ามพังเด็ดขาด) และคุณจะออกแบบให้มัน “พลาดไม่ได้” อย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ ที่จะเปลี่ยนวิธีเขียนโค้ดของคุณหลังจบใบงานนี้</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ก่อนส่งใบงาน ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึกว่า “คำถามใดที่ยังค้างอยู่ในหัวคุณ”</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

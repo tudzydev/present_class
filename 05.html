@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 5 (Python Enhanced) - Repository แบบ In-Memory</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 5 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง Repository Pattern แบบ In-Memory สำหรับบัญชีนักศึกษา
+        (บริบท: ระบบสมาชิกของมหาวิทยาลัยก่อนเชื่อมต่อฐานข้อมูลจริง)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือโอกาสพิเศษสำหรับคนที่อยากเป็น “ผู้พิทักษ์ข้อมูล” ของทีม
+        การได้เห็นว่าข้อมูลพังได้อย่างไรในสนามซ้อมวันนี้ คือรางวัลที่จะทำให้ระบบของคุณในอนาคต
+        เป็นที่ที่ทีมฝากข้อมูลได้อย่างสบายใจ
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> หนึ่งสัปดาห์ก่อนประกาศผลจบ</h2>
+    <div class="story">
+        <p>
+            มหาวิทยาลัยสั่งย้ายระบบรายชื่อนักศึกษาจากที่เก็บชั่วคราวไป MySQL ก่อนประกาศผลจบ 1 สัปดาห์
+            ทีมเปิดโค้ดดูแล้วพบว่ามีการเข้าถึงที่เก็บข้อมูลโดยตรงกระจายอยู่ <strong>23 แห่ง</strong>
+            แก้ไม่ทันทุกจุด — ประกาศผลจบต้องเลื่อน และนักศึกษาทั้งรุ่นคือคนที่รับผล
+            ทั้งที่ไม่มีใครเขียนโค้ดผิดแม้แต่บรรทัดเดียว
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเรื่องนี้ และความเจ็บปวดนี้เกิดจาก “คน” หรือจาก “โครงสร้างของโค้ด” มากกว่ากัน</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากวันแรกมีคนบอกว่า “เก็บลง dict ไปก่อน เดี๋ยวค่อยย้าย” คุณจะทำอย่างไรให้คำพูดนั้นไม่เป็นระเบิดเวลา</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “คืนที่ต้องซ่อนข้อมูลคนไข้จากนักลงทุน”</h2>
+    <div class="story">
+        <p>
+            พี่ปลา — Senior Engineer ใน startup สาย healthtech เล่าว่าวันหนึ่งที่นักลงทุนขอเดโมระบบ
+            แต่ห้ามใช้ข้อมูลคนไข้จริง โค้ดที่ผูกตรงเข้ากับ MongoDB ทำให้ทีมไม่สามารถสลับไปใช้ข้อมูลปลอมได้
+            ทั้งทีมต้องอยู่เขียน “ระบบปลอม” กันทั้งคืน หลังคืนนั้นเธอผลักดันให้เกิด
+            <em>“สัญญาการเข้าถึงข้อมูล”</em> ที่ทุก Use Case ต้องเรียกผ่านเท่านั้น
+            ตั้งแต่นั้นการสลับที่เก็บจริง/ปลอมใช้เวลาไม่ถึง 5 นาที
+            <em>“อย่าให้โค้ดธุรกิจรู้จักเทคโนโลยีเก็บข้อมูล — ให้มันรู้จักแค่สัญญา”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>รวมการเข้าถึงข้อมูลไว้หลัง “สัญญา” (ABC) เดียว — Repository Pattern</li>
+            <li>ซ่อนโครงสร้างภายใน และไม่คืนของที่ภายนอกแก้ไขได้ (Information Hiding)</li>
+            <li>ห่อ “เทคโนโลยีที่เปลี่ยนบ่อย” ด้วย abstraction ที่มั่นคง (Protected Variations)</li>
+            <li>แยก Entity (มีตัวตนด้วย id) ออกจาก Value Object (เทียบด้วยค่า) ให้ชัดเจน</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: ห้องนิรภัยที่ประตูเปิดทิ้งไว้</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ผิดหรือถูกไม่สำคัญ นี่คือการทดลองเพื่อเติบโต</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วสังเกตว่า “ข้อมูลภายใน” รั่วไหลได้อย่างไร</p>
+<pre class="code">
+class Student:
+    def __init__(self, id: int, email: str):
+        self.id = id
+        self.email = email
+
+
+class StudentStore:
+    def __init__(self):
+        self._students: dict[int, Student] = {}
+
+    def add(self, s: Student) -> None:
+        self._students[s.id] = s
+
+    def all(self) -> dict[int, Student]:
+        return self._students   # คืนโครงสร้างภายในโดยตรง!
+
+
+store = StudentStore()
+store.add(Student(680001, 'student@example.ac.th'))
+
+data = store.all()
+data[680001].email = 'hack@evil.com'   # ข้อมูลจริงพัง!
+print(store.all()[680001].email)
+</pre>
+    </div>
+
+    <div class="q"><p>1) เหตุใดการแก้ข้อมูลใน <code>data</code> จึงส่งผลถึงข้อมูลภายใน <code>store</code> ทั้งที่ <code>_students</code> ขึ้นต้นด้วย underscore</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) คุณจะออกแบบ <code>all()</code> และตัว Entity อย่างไรให้ “คนภายนอกแก้ไขข้อมูลภายในไม่ได้เลย”</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีป้องกันการแก้ไขข้อมูลภายในมา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Repository Pattern:</strong> รวมการเข้าถึงข้อมูลไว้หลัง “สัญญา” (ABC) ทำให้ Use Case ไม่ต้องรู้จักเทคโนโลยีการจัดเก็บ</li>
+            <li><strong>DIP:</strong> Use Case พึ่งพา abstraction (UserRepository) ไม่ใช่ implementation</li>
+            <li><strong>Information Hiding:</strong> ซ่อนโครงสร้างภายใน (private dict) และคืน “สำเนา” เพื่อป้องกันภายนอกแก้ไข</li>
+            <li><strong>Protected Variations:</strong> ห่อหุ้ม “เทคโนโลยีจัดเก็บ” (จุดที่เปลี่ยนบ่อย) ด้วย ABC ที่มั่นคง</li>
+            <li><strong>Entity vs Value Object:</strong> Entity มี identity (id) เช่น User; Value Object เทียบด้วยค่าและมัก immutable เช่น Email</li>
+            <li><strong>frozen dataclass:</strong> <code>@dataclass(frozen=True)</code> ทำให้แก้ไขฟิลด์หลังสร้างไม่ได้ (FrozenInstanceError)</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">Repository Pattern</span>
+        <span class="badge">DIP</span>
+        <span class="badge">Information Hiding</span>
+        <span class="badge">Protected Variations</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class User {
+        &lt;&lt;dataclass frozen&gt;&gt;
+        +id: int
+        +email: str
+    }
+
+    class UserRepository {
+        &lt;&lt;ABC&gt;&gt;
+        +save(user) None
+        +find_by_id(id) User or None
+        +all() list[User]
+    }
+
+    class InMemoryUserRepository {
+        -_users: dict[int, User]
+        +save(user) None
+        +find_by_id(id) User or None
+        +all() list[User]
+    }
+
+    InMemoryUserRepository --|> UserRepository : implements
+    InMemoryUserRepository --> User : stores
+    </pre>
+
+    <div class="note">
+        all() คืน list ใหม่ ป้องกันภายนอกแก้ไขโครงสร้างภายใน
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) «ABC» UserRepository ทำหน้าที่อะไรในระบบ และเหตุใดต้องแยก “สัญญา” ออกจาก implementation <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) ลูกศร “implements” จาก InMemoryUserRepository ชี้ไปยัง UserRepository หมายถึงอะไรในเชิงโค้ด Python <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) «dataclass frozen» ที่กำกับคลาส User หมายความว่าอย่างไร และ User จัดเป็น Entity ต่างจาก Value Object อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) เมธอด find_by_id คืนค่าเป็น “User or None” การคืน None สื่อความหมายว่าอย่างไร <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>5) ลูกศร “stores” จาก InMemoryUserRepository ไปยัง User หมายถึงอะไร และใช้โครงสร้างข้อมูลใดในการเก็บ <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) หากในอนาคตต้องการเปลี่ยนไปเก็บข้อมูลในฐานข้อมูล MySQL โค้ดส่วนใดต้องเปลี่ยนแปลงบ้าง <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class User:
+    id: int
+    email: str
+
+
+class UserRepository(ABC):
+    @abstractmethod
+    def save(self, user: User) -&gt; None: ...
+
+    @abstractmethod
+    def find_by_id(self, user_id: int) -&gt; User | None: ...
+
+    @abstractmethod
+    def all(self) -&gt; list[User]: ...
+
+
+class InMemoryUserRepository(UserRepository):
+    def __init__(self):
+        self._users: dict[int, User] = {}
+
+    def save(self, user: User) -&gt; None:
+        self._users[user.id] = user
+
+    def find_by_id(self, user_id: int) -&gt; User | None:
+        return self._users.get(user_id)
+
+    def all(self) -&gt; list[User]:
+        return list(self._users.values())
+
+
+repo = InMemoryUserRepository()
+repo.save(User(680001, "student@example.ac.th"))
+repo.save(User(680002, "student2@example.ac.th"))
+
+student = repo.find_by_id(680001)
+print(student)
+print(f"จำนวนนักศึกษาทั้งหมด: {len(repo.all())} คน")
+</pre>
+    <div class="q"><p>1) เหตุใดเมธอด all() จึงใช้ <code>list(self._users.values())</code> แทนการคืนโครงสร้างภายในโดยตรง ป้องกันความเสี่ยงใด <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) การเรียก <code>repo.find_by_id(999999)</code> ให้ผลลัพธ์เป็นอะไร และโค้ดบรรทัดใดรับผิดชอบ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>3) หาก save ผู้ใช้ที่มี id ซ้ำกับข้อมูลเดิมจะเกิดอะไรขึ้น เพราะเหตุใด <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) หากพยายามแก้ไข <code>user.email</code> หลังสร้างวัตถุแล้วจะเกิดอะไรขึ้น เพราะเหตุใดจึงออกแบบเป็น frozen <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+
+@dataclass((1)________________)
+class User:
+    id: int
+    email: str
+
+
+class UserRepository((2)________):
+    @(3)____________________
+    def save(self, user: User) -&gt; None: ...
+
+
+class InMemoryUserRepository(UserRepository):
+    def __init__(self):
+        self._users: (4)________[int, User] = {}
+
+    def save(self, user: User) -&gt; None:
+        self._users[user.id] = user
+
+    def find_by_id(self, user_id: int) -&gt; User | None:
+        return self._users.(5)________(user_id)
+
+    def all(self) -&gt; list[User]:
+        return (6)________(self._users.values())
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>save(User(680001, 'student@example.ac.th')) แล้ว find_by_id(680001)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>find_by_id(999999)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>save เพิ่มอีก 1 คน แล้ว all()</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>save(User(680001, 'new@example.ac.th')) แล้ว find_by_id(680001)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>lst = all(); แล้ว lst.append(User(1, 'x@y.z')) จากนั้นเรียก all() อีกครั้ง</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>user.email = 'hack@x.y' (พยายามแก้ไข frozen dataclass)</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) Repository Pattern ช่วยลด coupling ระหว่าง Use Case กับเทคโนโลยีการจัดเก็บข้อมูลอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) “จุดที่เปลี่ยนแปลง” ในข้อนี้คืออะไร และการออกแบบนี้ปกป้องระบบด้วย Protected Variations อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) เมื่อต้องเขียน Unit Test ให้ RegisterUserService ABC UserRepository ช่วยให้การทดสอบง่ายขึ้นอย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ จุดใดคือ “การเข้าถึงที่เก็บข้อมูลโดยตรง” ที่จะกลายเป็นระเบิดเวลาเมื่อเปลี่ยนเทคโนโลยี และคุณจะห่อมันด้วย ABC อย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับนิสัย “ไม่คืนโครงสร้างภายในให้ภายนอก” ที่คุณจะนำไปใช้จริง</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับ Repository หรือการปกป้องข้อมูล</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ใบงานที่ 8 (Python Enhanced) - Notifier ระบบแจ้งเตือนหลายช่องทาง</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+    <style>
+        :root { color-scheme: light; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans Thai", sans-serif;
+            line-height: 1.75;
+            background: #eef2f7;
+            color: #0f172a;
+        }
+        .sheet {
+            width: min(900px, calc(100% - 2rem));
+            margin: 1.5rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 2rem 2.25rem;
+        }
+        h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+        h2 {
+            font-size: 1.15rem;
+            margin: 1.75rem 0 0.5rem;
+            padding: 0.4rem 0.75rem;
+            background: #eef2ff;
+            border-left: 5px solid #4f46e5;
+            border-radius: 6px;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr 0.8fr;
+            gap: 0.75rem;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+        .meta div { border-bottom: 1px solid #94a3b8; padding-bottom: 0.2rem; }
+        .objectives li { margin: 0.2rem 0; }
+        pre.mermaid, pre.code {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            overflow: auto;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        pre.mermaid { background: #f8fafc; border: 1px dashed rgba(15, 23, 42, 0.2); }
+        pre.code { background: #0f172a; color: #e2e8f0; }
+        .q { margin: 0.9rem 0; }
+        .q p { margin: 0 0 0.35rem; }
+        .pts {
+            display: inline-block;
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 0.1rem 0.55rem;
+            margin-left: 0.4rem;
+        }
+        .line { height: 2em; border-bottom: 1px solid #94a3b8; margin-bottom: 0.15rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 0.75rem 0; }
+        th, td { border: 1px solid #94a3b8; padding: 0.5rem 0.6rem; vertical-align: top; text-align: left; }
+        th { background: #f1f5f9; }
+        td.fill { height: 3.2em; }
+        .badge-row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.75rem 0; }
+        .badge {
+            background: #f1f5f9;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.28rem 0.65rem;
+        }
+        .tag3f {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.6rem;
+            margin-right: 0.4rem;
+        }
+        .coach {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .story {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .sandbox {
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+        }
+        .knowledge {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin: 0.9rem 0;
+            font-size: 0.93rem;
+        }
+        .note {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.93rem;
+            margin: 0.75rem 0;
+        }
+        .teacher { border-top: 3px dashed #0f172a; margin-top: 2rem; padding-top: 1rem; }
+        .answer-key {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.93rem;
+            margin: 0.6rem 0;
+        }
+        @media print {
+            body { background: white; }
+            .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; padding: 0; }
+            .teacher { page-break-before: always; }
+            pre.mermaid, pre.code, .story, .sandbox, .coach { break-inside: avoid; }
+        }
+        @page { size: A4; margin: 14mm; }
+    </style>
+</head>
+
+<body>
+<div class="sheet">
+
+    <h1>ใบงานปฏิบัติการที่ 8 (ฉบับ Python - Enhanced Edition)</h1>
+    <p style="margin:0;">
+        เรื่อง ระบบแจ้งเตือนตารางเรียน/การบ้านหลายช่องทาง (Notifier)
+        (บริบท: ระบบแจ้งเตือนของมหาวิทยาลัยแจ้งนักศึกษาผ่าน Email/SMS/Line)<br />
+        รายวิชา การเขียนโปรแกรมเชิงวัตถุ (Python 3.10+)
+    </p>
+
+    <div class="meta">
+        <div>ชื่อ-นามสกุล: </div>
+        <div>รหัสนักศึกษา: </div>
+        <div>ชั้นปี/ห้อง: </div>
+        <div>คะแนน: /50</div>
+    </div>
+
+    <!-- Coach: Reward-based opening -->
+    <div class="coach">
+        <strong>💬 ข้อความจากโค้ช:</strong> ใบงานนี้คือโอกาสพิเศษสำหรับคนที่อยากออกแบบระบบที่
+        “ข้อความสำคัญต้องไปถึงผู้รับ ไม่ว่าเทคโนโลยีจะเปลี่ยนไปกี่แบบ” การได้เห็นความเงียบของโค้ด
+        ที่ข้ามช่องทางใหม่ไปโดยไม่บอกใครในวันนี้ คือรางวัลที่จะทำให้ระบบของคุณในอนาคตไม่ทิ้งใครไว้ข้างหลัง
+    </div>
+
+    <!-- Facilitator: Feeling -->
+    <h2><span class="tag3f">Feeling</span> คาบที่เปลี่ยนห้อง แต่ข้อความไปไม่ถึง</h2>
+    <div class="story">
+        <p>
+            วันสอบกลางภาค อาจารย์เปลี่ยนห้องสอบจาก A101 เป็น B204 กะทันหัน
+            ระบบแจ้งเตือนส่งข่าวทาง <strong>อีเมลเท่านั้น</strong> แต่นักศึกษาเกินครึ่งไม่ได้เปิดอีเมลระหว่างวัน
+            ผลคือกว่า 100 คนไปผิดห้องและต้องสอบล่าช้า ฝ่ายวิชาการขอให้เพิ่ม SMS และ Line ทันที
+            แต่โปรแกรมเมอร์ตอบว่า “โค้ดแจ้งเตือนเป็น if-elif ก้อนเดียว แตะแล้วเสี่ยงพังช่องทางเดิม ขอเวลา 2 สัปดาห์”
+            — เหตุการณ์เดิมจึงเกิดขึ้นซ้ำอีกครั้งในสัปดาห์ถัดไป
+        </p>
+    </div>
+    <div class="q"><p>1) คุณรู้สึกอย่างไรกับเรื่องนี้ และระหว่าง “ระบบที่ส่งผิด” กับ “ระบบที่เงียบแล้วข้ามไปเลย” แบบใดน่ากลัวกว่ากัน เพราะเหตุใด</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) หากทุกภาคเรียนมหาวิทยาลัยเพิ่มช่องทางสื่อสารใหม่ ใครจะต้องเหนื่อยที่สุด — คนออกแบบโค้ด หรือคนตามแก้โค้ด</p>
+        <div class="line"></div></div>
+
+    <!-- Mentor: Storytelling + Decoding Success -->
+    <h2> เรื่องเล่าจากพี่เลี้ยง: “วันที่เพิ่ม Line แล้ว SMS พังทั้งระบบ”</h2>
+    <div class="story">
+        <p>
+            พี่นก — Senior Engineer ในบริษัทโลจิสติกส์ เล่าว่าโค้ดแจ้งเตือนสถานะพัสดุสมัยก่อน
+            เป็น if-elif ก้อนใหญ่ (email / sms / push) ทุกครั้งที่ฝ่ายการตลาดขอเพิ่มช่องทาง
+            ต้องแก้โค้ดก้อนเดิมเสมอ วันหนึ่งทีมเพิ่ม Line ตามคำขอลูกค้า
+            แต่เผลอทำให้สาขา else ของ SMS พัง — ลูกค้าหลักหมื่นไม่ได้รับแจ้งนัดส่งของ
+            สายด่วนร้องเรียนถล่มทลายทั้งวัน หลังวิกฤตเธอ refactor ให้แต่ละช่องทางเป็นคลาสอิสระ
+            ภายใต้ interface เดียว และให้ Notifier รับเป็นลิสต์ ตั้งแต่那天การเพิ่มช่องทางใหม่
+            ใช้เวลาไม่ถึงครึ่งวันและไม่มี regression อีกเลย
+            <em>“อย่าถามวัตถุว่ามันคือประเภทไหน จงบอกให้มันทำหน้าที่ของมัน”</em>
+        </p>
+        <p><strong>ถอดรหัสวิธีคิดของคนสำเร็จ:</strong></p>
+        <ul>
+            <li>เรียกเมธอดเดียวกันแต่ให้แต่ละวัตถุ dispatch พฤติกรรมของตนเอง (Polymorphism)</li>
+            <li>ห้ามตรวจชนิดด้วย isinstance — มันคือสัญญาณว่าระบบ “ปิด” รับการขยาย</li>
+            <li>ห่อ “ช่องทางที่งอกเรื่อย ๆ” ด้วย interface ที่มั่นคง (Protected Variations)</li>
+            <li>ประกอบระบบจากชิ้นส่วนเล็ก ๆ (Composition) — Notifier ถือลิสต์ของ channel</li>
+        </ul>
+    </div>
+
+    <!-- Facilitator: Finding (Sandbox) -->
+    <h2><span class="tag3f">Finding</span> Sandbox: Notifier ที่ “เงียบเกินไป”</h2>
+    <div class="sandbox">
+        <p><strong>ทัศนคติประจำใบงาน:</strong> Failure is learning — ผิดหรือถูกไม่สำคัญ นี่คือการทดลองเพื่อเติบโต</p>
+        <p>พิจารณาโค้ดต่อไปนี้ แล้วเติม LineChannel เข้าไปในจินตนาการของคุณ</p>
+<pre class="code">
+class Notifier:
+    def notify(self, channel, recipient: str, message: str) -> None:
+        if isinstance(channel, EmailChannel):
+            print(f"[Email] ถึง: {recipient} | ข้อความ: {message}")
+        elif isinstance(channel, SmsChannel):
+            print(f"[SMS] ถึง: {recipient} | ข้อความ: {message}")
+        # แล้ว LineChannel ล่ะ? ...ถูกข้ามไปเงียบ ๆ!
+
+
+notifier = Notifier()
+notifier.notify(LineChannel(), 'student@example.ac.th', 'ห้องสอบเปลี่ยนเป็น B204')
+# นักศึกษาไม่ได้รับข้อความ ...และไปผิดห้องอีกครั้ง
+</pre>
+    </div>
+
+    <div class="q"><p>1) เหตุใดการ “ข้ามเงียบ ๆ” จึงอันตรายกว่าการพังเสียงดัง และใครคือคนที่รับผลโดยไม่รู้ว่าระบบพลาด</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) คุณจะออกแบบอย่างไรให้ “การลืมช่องทางใหม่เป็นไปไม่ได้เลย” (ระบบต้องส่งเสียงเมื่อเจอสิ่งที่ไม่รู้จัก หรือบังคับให้รองรับตั้งแต่แรก)</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลองให้ AI เสนอวิธีกำจัด if-isinstance ในโค้ดนี้มา 3 วิธี แล้วถกกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด และคำตอบของ AI เชื่อถือได้มากน้อยเพียงใด (ฟังเพื่อนให้จบก่อนสรุปนะ)</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Teacher: Knowledge Box (5%) -->
+    <div class="knowledge">
+        <strong>📦 กล่องความรู้เสริม (อ่านเฉพาะเมื่อจำเป็น):</strong>
+        <ul>
+            <li><strong>Polymorphism:</strong> เรียกเมธอดเดียวกัน แต่แต่ละวัตถุ dispatch ไปยังพฤติกรรมของตนเอง</li>
+            <li><strong>OCP:</strong> เพิ่มช่องทางใหม่ = เพิ่มคลาสใหม่ โดย Notifier ไม่ต้องแก้ไข</li>
+            <li><strong>DIP:</strong> Notifier พึ่งพา abstraction (NotificationChannel) ไม่ใช่ concrete class</li>
+            <li><strong>Composition:</strong> Notifier ประกอบขึ้นจากลิสต์ของ channel (list) ส่งได้หลายช่องทางพร้อมกัน</li>
+            <li><strong>Protected Variations:</strong> ห่อหุ้ม “ช่องทางที่งอกเรื่อย ๆ” ด้วย ABC ที่มั่นคง</li>
+            <li><strong>ทำไม isinstance จึงแย่:</strong> ผิด polymorphism, ทำให้ระบบปิดรับการขยาย, และข้ามสิ่งที่ไม่รู้จักอย่างเงียบ ๆ</li>
+        </ul>
+    </div>
+
+    <h2>แผนภาพอ้างอิง (เวอร์ชันแข็งแรง)</h2>
+    <div class="badge-row">
+        <span class="badge">DIP</span>
+        <span class="badge">OCP</span>
+        <span class="badge">Polymorphism</span>
+        <span class="badge">Composition</span>
+        <span class="badge">Protected Variations</span>
+    </div>
+
+    <pre class="mermaid">
+classDiagram
+    class NotificationChannel {
+        &lt;&lt;ABC&gt;&gt;
+        +send(recipient, message) None
+    }
+
+    class EmailChannel {
+        +send(recipient, message) None
+    }
+
+    class SmsChannel {
+        +send(recipient, message) None
+    }
+
+    class Notifier {
+        -_channels: list[NotificationChannel]
+        +__init__(channels)
+        +notify(recipient, message) None
+    }
+
+    class ValueError {
+        &lt;&lt;exception&gt;&gt;
+    }
+
+    EmailChannel --|> NotificationChannel : implements
+    SmsChannel --|> NotificationChannel : implements
+    Notifier --> NotificationChannel : sends
+    Notifier --> ValueError : raises
+    </pre>
+
+    <div class="note">
+        เพิ่มช่องทางใหม่ได้โดยไม่ต้องแก้ Notifier (OCP)
+    </div>
+
+    <h2>ส่วนที่ 1: อ่านแผนภาพแล้วตอบคำถาม (10 คะแนน)</h2>
+    <div class="q"><p>1) «ABC» NotificationChannel ที่มีเมธอด <code>+send(recipient, message) : None</code> ทำหน้าที่อะไรในระบบ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เหตุใด EmailChannel และ SmsChannel จึงเสียบเข้ากับ Notifier เดียวกันได้ สอดคล้องกับแนวคิดใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) ลูกศร “sends” จาก Notifier ไปยัง NotificationChannel หมายถึงอะไร และเหตุใด Notifier จึงเก็บ channels เป็น <code>list[NotificationChannel]</code> <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) ลูกศร “raises” ชี้ไปยัง ValueError หมายถึงการตรวจสอบใด และเหตุใดจึงใช้ <code>message.strip()</code> ในการตรวจสอบ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>5) เหตุใด Notifier จึงห้ามตรวจสอบชนิดของ Channel ด้วย isinstance <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+    <div class="q"><p>6) หากต้องการเพิ่ม LineChannel ในอนาคต โค้ดส่วนใดต้องแก้ไขบ้าง (OCP) <span class="pts">1 คะแนน</span></p>
+        <div class="line"></div></div>
+
+    <h2>ส่วนที่ 2: วิเคราะห์โค้ด (10 คะแนน)</h2>
+<pre class="code">
+from abc import ABC, abstractmethod
+from typing import Iterable
+
+
+class NotificationChannel(ABC):
+    @abstractmethod
+    def send(self, recipient: str, message: str) -&gt; None: ...
+
+
+class EmailChannel(NotificationChannel):
+    def send(self, recipient: str, message: str) -&gt; None:
+        print(f"[Email] ถึง: {recipient} | ข้อความ: {message}")
+
+
+class SmsChannel(NotificationChannel):
+    def send(self, recipient: str, message: str) -&gt; None:
+        print(f"[SMS] ถึง: {recipient} | ข้อความ: {message}")
+
+
+class Notifier:
+    def __init__(self, channels: Iterable[NotificationChannel]):
+        self._channels = list(channels)
+
+    def notify(self, recipient: str, message: str) -&gt; None:
+        if not message.strip():
+            raise ValueError("Message cannot be empty.")
+        for channel in self._channels:
+            channel.send(recipient, message)
+
+
+notifier = Notifier([EmailChannel(), SmsChannel()])
+
+# Test case 1: ส่งข้อความสำเร็จ
+notifier.notify("student@example.ac.th", "มีการบ้าน PHP กำหนดส่งวันศุกร์นี้")
+
+# Test case 2: ข้อความว่างต้องถูกปฏิเสธ
+try:
+    notifier.notify("student@example.ac.th", "   ")
+except ValueError as e:
+    print("Expected error:", e)
+</pre>
+    <div class="q"><p>1) โค้ดบรรทัดใดแสดงให้เห็นว่า Notifier ไม่ผูกติดกับ concrete channel จงอธิบาย <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เมื่อเรียก notify ใน Test case 1 ผลลัพธ์ที่แสดงบนหน้าจอคืออะไรบ้าง <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) การเรียก notify ด้วยข้อความ <code>'   '</code> จะเกิดอะไรขึ้น เพราะเหตุใด <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>4) หาก Notifier ใช้ <code>if isinstance(channel, EmailChannel):</code> เพื่อเลือกวิธีส่ง จะผิดหลักการใด และส่งผลเสียอย่างไร <span class="pts">3 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <h2>ส่วนที่ 3: เติมโค้ดในช่องว่าง (12 คะแนน)</h2>
+<pre class="code">
+from abc import (1)________, abstractmethod
+from typing import Iterable
+
+
+class NotificationChannel(ABC):
+    @(2)____________________
+    def send(self, recipient: str, message: str) -&gt; None: ...
+
+
+class Notifier:
+    def __init__(self, channels: (3)________________[NotificationChannel]):
+        self._channels = (4)________(channels)
+
+    def notify(self, recipient: str, message: str) -&gt; None:
+        if not message.(5)________():
+            raise ValueError("Message cannot be empty.")
+        for channel in self._channels:
+            channel.(6)________(recipient, message)
+</pre>
+    <table>
+        <thead><tr><th>ช่องที่</th><th>คำตอบ</th><th>ช่องที่</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+            <tr><td>(1)</td><td class="fill"></td><td>(4)</td><td class="fill"></td></tr>
+            <tr><td>(2)</td><td class="fill"></td><td>(5)</td><td class="fill"></td></tr>
+            <tr><td>(3)</td><td class="fill"></td><td>(6)</td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 4: ทดสอบและบันทึกผล (12 คะแนน)</h2>
+    <table>
+        <thead><tr><th style="width:42%;">Test Case</th><th>ผลลัพธ์ที่คาดหวัง</th><th>ผลลัพธ์จริง</th><th style="width:10%;">ผ่าน?</th></tr></thead>
+        <tbody>
+            <tr><td>Notifier([EmailChannel()]) แล้ว notify ข้อความปกติ</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Notifier([EmailChannel(), SmsChannel()]) แล้ว notify ข้อความปกติ</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>notify ด้วยข้อความ '   '</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>notify ด้วยข้อความ ''</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>เพิ่ม LineChannel(NotificationChannel) แล้วใส่ใน Notifier</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+            <tr><td>Notifier([]) แล้ว notify ข้อความปกติ</td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        </tbody>
+    </table>
+
+    <h2>ส่วนที่ 5: สะท้อนคิดเชิงออกแบบ OOAD (6 คะแนน)</h2>
+    <div class="q"><p>1) ระบบนี้สอดคล้องกับ Open/Closed Principle อย่างไร จงยกตัวอย่างการเพิ่มช่องทางใหม่ <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) “จุดที่เปลี่ยนแปลง” ในข้อนี้คืออะไร และการออกแบบนี้ปกป้อง Notifier ด้วย Protected Variations อย่างไร <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>3) การใช้ list ร่วมกับ for loop และเรียก send() ผ่าน ABC ดีกว่าการตรวจชนิดของแต่ละ channel อย่างไร จงอธิบายด้วยแนวคิด Polymorphism <span class="pts">2 คะแนน</span></p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Facilitator: Future -->
+    <h2><span class="tag3f">Future</span> นำสิ่งค้นพบไปสู่อนาคต</h2>
+    <div class="q"><p>1) ในโปรเจกต์ Python ถัดไปของคุณ ส่วนใดคือ “ช่องทางแจ้งเตือนคนใหม่” (สิ่งที่งอกเพิ่มเรื่อย ๆ) และคุณจะออกแบบให้แกนกลางไม่ต้องแก้ไขอย่างไร</p>
+        <div class="line"></div><div class="line"></div></div>
+    <div class="q"><p>2) เขียน commitments สั้น ๆ 2 ข้อ เกี่ยวกับนิสัย “บอกให้วัตถุทำหน้าที่ของมัน แทนการถามว่ามันคืออะไร” ที่คุณจะนำไปใช้จริง</p>
+        <div class="line"></div><div class="line"></div></div>
+
+    <!-- Coach: Reflect -->
+    <div class="coach">
+        <strong>🪞 มุมสะท้อนคิดของโค้ช:</strong>
+        <div class="q"><p>ชมความพยายามของตัวเอง 1 เรื่อง แล้วบันทึก “คำถามที่ยังค้างอยู่ในหัวคุณ” เกี่ยวกับ polymorphism หรือการออกแบบระบบแจ้งเตือน</p>
+            <div class="line"></div><div class="line"></div></div>
+    </div>
+
+    <h2>เกณฑ์การให้คะแนน</h2>
+    <table>
+        <thead><tr><th>ส่วนที่</th><th>เนื้อหา</th><th>คะแนน</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>อ่านแผนภาพแล้วตอบคำถาม</td><td>10</td></tr>
+            <tr><td>2</td><td>วิเคราะห์โค้ด</td><td>10</td></tr>
+            <tr><td>3</td><td>เติมโค้ดในช่องว่าง</td><td>12</td></tr>
+            <tr><td>4</td><td>ทดสอบและบันทึกผล</td><td>12</td></tr>
+            <tr><td>5</td><td>สะท้อนคิดเชิงออกแบบ</td><td>6</td></tr>
+            <tr><td colspan="2"><strong>รวม</strong></td><td><strong>50</strong></td></tr>
+        </tbody>
+    </table>
+    <p style="font-size:0.9rem; color:#475569;">* ส่วน Feeling / Sandbox / Future / มุมสะท้อนคิด ไม่ตัดคะแนน — มีไว้เพื่อการเรียนรู้เท่านั้น</p>
+
+
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose'
+    });
+</script>
+</body>
+</html>
