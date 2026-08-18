@@ -178,9 +178,9 @@
         </p>
     </div>
     <div class="q"><p>1) คุณรู้สึกอย่างไรกับเหตุการณ์นี้ และกังวลเรื่องใดมากที่สุดหากคุณเป็นเจ้าของระบบ</p>
-        <div class="line"></div></div>
+        <div class="line">รู้สึกว่าไม่ควรเกิดขึ้นและควรใจเย็นมากกว่านี้ในการปรับเปลี่ยนข้อมูล ในมุมมองของเจ้าของระบบ กังวลเรื่อง ข้อมูลของระบบเพราะถ้าหากมีการกรอกข้อมูลที่ผิดอาจทำให้ข้อมูลเสีบหายได้และอาจต้อง remigration data ใหม่</div></div>
     <div class="q"><p>2) ความผิดพลาดนี้เกิดจาก “คน” หรือ “การออกแบบ” มากกว่ากัน เพราะเหตุใด</p>
-        <div class="line"></div></div>
+        <div class="line">ความผิดพลาดที่คน เพราะว่ามีความรีบร้อนเกินทำให้มีการกรอกส่วนลดผิด ถ้าหากไม่รีบร้อนอาจจไม่มีการกรอกผิด</div></div>
 
     <!-- Mentor: Storytelling + Decoding Success -->
     <h2> เรื่องเล่าจากพี่เลี้ยง: “บรรทัดเดียวที่เปลี่ยนวิธีคิด”</h2>
@@ -220,12 +220,76 @@ print(p.price)
     </div>
 
     <div class="q"><p>1) ผลลัพธ์คืออะไร และเหตุใดโค้ดภายนอกจึงแก้ราคาได้โดยไม่ถูกทักท้วง</p>
-        <div class="line"></div></div>
+        <div class="line">ผลสัพธ์ -500 เพราะว่า attributes ไม่เป็น private เลยทำให้สามารถแก้ไข attributes จากภายนอกได้</div></div>
     <div class="q"><p>2) หากต้องเลือก “จุดเดียว” ในคลาสเพื่อเฝ้าระวังราคา คุณจะเลือกจุดใด เพราะเหตุใด</p>
-        <div class="line"></div></div>
+        <div class="line">price เพราะว่าถ้าหากมีการกรอกข้อมลที่ติดลบระบบตัวของระบบและข้อมูลก็จะผิดพลาดและอาจส่งผลถึงการเข้าใจในข้อมูลนั้นๆ</div></div>
     <div class="q"><p>3) ลองให้ AI เสนอวิธีป้องกันราคาติดลบใน Python มา 3 วิธี แล้วถกเถียงกับเพื่อน: วิธีใดน่าเชื่อถือที่สุด เพราะเหตุผลใด (AI เชื่อถือได้มากน้อยเพียงใด?)</p>
-        <div class="line"></div>
-        <div class="line"></div></div>
+        <div class="line">
+            วิธีที่ 1: ใช้ property setter
+
+class Product:
+    def __init__(self, id: int, name: str, price: float):
+        self.id = id
+        self.name = name
+        self.price = price
+
+
+    @property
+    def price(self):
+        return self._price
+
+
+    @price.setter
+    def price(self, value):
+        if value < 0:
+            raise ValueError("ราคาต้องไม่ติดลบ")
+        self._price = value
+
+
+p = Product(1, 'สมุดโน้ต', 45.00)
+p.price = -500  # ValueError
+
+ข้อดี: ทุกครั้งที่กำหนด p.price จะผ่านการตรวจสอบ
+ข้อเสีย: คนเขียนโปรแกรมต้องเข้าใจ property
+        </div>
+        <div class="line">
+            วิธีที่ 2: ตรวจสอบใน __init__ อย่างเดียว
+
+class Product:
+    def __init__(self, id: int, name: str, price: float):
+        if price < 0:
+            raise ValueError("ราคาต้องไม่ติดลบ")
+
+
+        self.id = id
+        self.name = name
+        self.price = price
+
+ข้อดี: ง่ายและอ่านเข้าใจง่าย
+ข้อเสีย: ป้องกันเฉพาะตอนสร้าง object เท่านั้น เช่น หลังจากนั้นยังทำ p.price = -500 ได้อยู่
+        </div></div>
+        <div>
+            <div class="line">
+                วิธีที่ 3: ใช้ dataclass + __post_init__
+
+from dataclasses import dataclass
+
+
+@dataclass
+class Product:
+    id: int
+    name: str
+    price: float
+
+
+    def __post_init__(self):
+        if self.price < 0:
+            raise ValueError("ราคาต้องไม่ติดลบ")
+
+ข้อดี: ลดโค้ด boilerplate และเหมาะกับคลาสที่เป็นข้อมูล
+ข้อเสีย: ก็ยังตรวจเฉพาะตอนสร้าง object ไม่ได้ป้องกัน p.price = -500 ภายหลัง
+            </div>
+        </div>
 
     <!-- Teacher: Knowledge Box (5%) -->
     <div class="knowledge">
